@@ -5,14 +5,9 @@
     "type": true
   },
   "tags": ["-lintignore"],
-  "ignoreDependencies": [
-    "lint-staged",
-    "husky",
-    "tailwindcss",
-    "tw-animate-css"
-  ],
+  "ignoreDependencies": ["lint-staged", "tailwindcss", "tw-animate-css"],
   "ignoreBinaries": ["husky"],
   "entry": ["src/app/**/*.{ts,tsx}", "!src/app/**/*.test.{ts,tsx}"],
   "project": ["src/**/*.{ts,tsx}"],
-  "ignore": ["src/components/ui/**"]
+  "ignore": ["src/components/ui/**", "src/components/index.ts"]
 }
