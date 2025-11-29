@@ -7,9 +7,3 @@ export interface CartItem {
   quantity: number;
   discount?: number;
 }
-
-export interface Cart {
-  items: CartItem[];
-  totalItems: number;
-  totalPrice: number;
-}
