@@ -1,23 +1,43 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useProductDetail } from '@/hooks/useProductDetail';
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useProductDetail } from "@/hooks/useProductDetail";
+import { useCartStore } from "@/stores/cartStore";
 
 interface ProductDetailViewProps {
   productId: number;
 }
 
-export default function ProductDetailView({ productId }: ProductDetailViewProps) {
+export default function ProductDetailView({
+  productId,
+}: ProductDetailViewProps) {
   const { product, loading, error } = useProductDetail(productId);
   const [selectedImage, setSelectedImage] = useState(0);
   const [imageError, setImageError] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const addItem = useCartStore((state) => state.addItem);
 
   const handleAddToCart = () => {
     if (product) {
-      alert(`Agregado ${quantity} unidad(es) de "${product.title}" al carrito`);
+      // Calcular el precio numérico desde el precio base y descuento
+      const basePrice = parseFloat(product.price.replace(/[^0-9]+/g, ""));
+      const finalPrice =
+        product.discount > 0
+          ? basePrice * (1 - product.discount / 100)
+          : basePrice;
+
+      for (let i = 0; i < quantity; i++) {
+        addItem({
+          id: product.id,
+          name: product.title,
+          description: product.description,
+          price: finalPrice,
+          imageUrl: product.imagesURL[0] || "",
+          discount: product.discount,
+        });
+      }
     }
   };
 
@@ -32,7 +52,9 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
   if (error || !product) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen gap-4">
-        <p className="text-red-500 text-lg">{error || 'Producto no encontrado'}</p>
+        <p className="text-red-500 text-lg">
+          {error || "Producto no encontrado"}
+        </p>
         <Link href="/products" className="text-blue-600 hover:underline">
           Volver a productos
         </Link>
@@ -46,9 +68,17 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
         {/* Breadcrumb */}
         <nav className="mb-8 text-sm">
           <ol className="flex items-center space-x-2 text-gray-500">
-            <li><Link href="/" className="hover:text-blue-600">Inicio</Link></li>
+            <li>
+              <Link href="/" className="hover:text-blue-600">
+                Inicio
+              </Link>
+            </li>
             <li>/</li>
-            <li><Link href="/products" className="hover:text-blue-600">Productos</Link></li>
+            <li>
+              <Link href="/products" className="hover:text-blue-600">
+                Productos
+              </Link>
+            </li>
             <li>/</li>
             <li className="text-gray-900 truncate max-w-md">{product.title}</li>
           </ol>
@@ -72,8 +102,16 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                  <svg
+                    className="w-32 h-32"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
               )}
@@ -97,9 +135,9 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
                       setImageError(false);
                     }}
                     className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                      selectedImage === index 
-                        ? 'border-blue-600' 
-                        : 'border-gray-200 hover:border-gray-300'
+                      selectedImage === index
+                        ? "border-blue-600"
+                        : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
                     <Image
@@ -119,7 +157,9 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
           <div className="space-y-6">
             {/* Marca y Estado */}
             <div className="flex items-center gap-3 text-sm">
-              <span className="text-gray-600 uppercase tracking-wide">{product.brandName}</span>
+              <span className="text-gray-600 uppercase tracking-wide">
+                {product.brandName}
+              </span>
               <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
                 {product.statusName}
               </span>
@@ -133,7 +173,9 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
             {/* Categoría */}
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500">Categoría:</span>
-              <span className="text-sm font-medium text-gray-700">{product.categoryName}</span>
+              <span className="text-sm font-medium text-gray-700">
+                {product.categoryName}
+              </span>
             </div>
 
             {/* Precio */}
@@ -157,18 +199,29 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
 
             {/* Stock */}
             <div className="space-y-2">
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border ${
-                product.isAvailable 
-                  ? 'bg-green-50 text-green-700 border-green-200' 
-                  : 'bg-red-50 text-red-700 border-red-200'
-              }`}>
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              <div
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border ${
+                  product.isAvailable
+                    ? "bg-green-50 text-green-700 border-green-200"
+                    : "bg-red-50 text-red-700 border-red-200"
+                }`}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 <span className="font-medium">{product.stockIndicator}</span>
               </div>
               <p className="text-sm text-gray-600">
-                <span className="font-semibold">{product.stock}</span> unidades disponibles
+                <span className="font-semibold">{product.stock}</span> unidades
+                disponibles
               </p>
             </div>
 
@@ -190,11 +243,20 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
                   min="1"
                   max={product.stock}
                   value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, Math.min(product.stock, Number(e.target.value))))}
+                  onChange={(e) =>
+                    setQuantity(
+                      Math.max(
+                        1,
+                        Math.min(product.stock, Number(e.target.value)),
+                      ),
+                    )
+                  }
                   className="w-20 h-10 text-center bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900"
                 />
                 <button
-                  onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                  onClick={() =>
+                    setQuantity(Math.min(product.stock, quantity + 1))
+                  }
                   disabled={quantity >= product.stock}
                   className="w-10 h-10 rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-xl font-semibold text-gray-700"
                 >
@@ -210,7 +272,7 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
                 disabled={!product.isAvailable}
                 className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg disabled:bg-gray-300 disabled:cursor-not-allowed shadow-sm"
               >
-                {product.isAvailable ? 'Agregar al carrito' : 'No disponible'}
+                {product.isAvailable ? "Agregar al carrito" : "No disponible"}
               </button>
 
               <Link
@@ -223,7 +285,9 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
 
             {/* Descripción */}
             <div className="border-t border-gray-200 pt-6 space-y-3">
-              <h2 className="text-lg font-semibold text-gray-900">Descripción del producto</h2>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Descripción del producto
+              </h2>
               <p className="text-gray-600 leading-relaxed">
                 {product.description}
               </p>
@@ -231,23 +295,33 @@ export default function ProductDetailView({ productId }: ProductDetailViewProps)
 
             {/* Especificaciones */}
             <div className="border-t border-gray-200 pt-6 space-y-3">
-              <h2 className="text-lg font-semibold text-gray-900">Especificaciones</h2>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Especificaciones
+              </h2>
               <dl className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <dt className="text-gray-500">Marca</dt>
-                  <dd className="font-medium text-gray-900">{product.brandName}</dd>
+                  <dd className="font-medium text-gray-900">
+                    {product.brandName}
+                  </dd>
                 </div>
                 <div>
                   <dt className="text-gray-500">Estado</dt>
-                  <dd className="font-medium text-gray-900">{product.statusName}</dd>
+                  <dd className="font-medium text-gray-900">
+                    {product.statusName}
+                  </dd>
                 </div>
                 <div>
                   <dt className="text-gray-500">Categoría</dt>
-                  <dd className="font-medium text-gray-900">{product.categoryName}</dd>
+                  <dd className="font-medium text-gray-900">
+                    {product.categoryName}
+                  </dd>
                 </div>
                 <div>
                   <dt className="text-gray-500">Stock</dt>
-                  <dd className="font-medium text-gray-900">{product.stock} unidades</dd>
+                  <dd className="font-medium text-gray-900">
+                    {product.stock} unidades
+                  </dd>
                 </div>
               </dl>
             </div>
