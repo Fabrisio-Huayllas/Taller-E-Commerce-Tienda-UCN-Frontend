@@ -81,3 +81,15 @@ NEXTAUTH_SECRET=your-auth-secret-here
    ```
 
    Una vez que ya hayas seguido estos pasos, el proyecto se ejecutara en `http://localhost:3000`. Para ver el sitio, presiona `ctrl` y abre la dirección en tu navegador.
+
+## Integrantes del grupo
+
+- **Sebastian Hernandez** - 21.701.267-8 - sebastian.hernandez02@alumnos.ucn.cl
+- **Fabrisio Huayllas** - 22.108.928-6 - fabrisio.huayllas02@alumnos.ucn.cl
+- **Rodrigo Tapia** - 21.382.034-6 - rodrigo04@alumnos.ucn.cl
+
+---
+
+## Licencia
+
+Este proyecto es desarrollado con fines académicos para la Universidad Católica del Norte.
