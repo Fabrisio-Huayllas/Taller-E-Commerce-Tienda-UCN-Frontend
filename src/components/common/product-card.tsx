@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { Product } from '@/services/productService';
-import { useState } from 'react';
+import Image from "next/image";
+import { Product } from "@/services/productService";
+import { useState } from "react";
+import { useCartStore } from "@/stores/cartStore";
 
 interface ProductCardProps {
   product: Product;
@@ -11,11 +12,27 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product, onClick }: ProductCardProps) => {
   const [imageError, setImageError] = useState(false);
+  const addItem = useCartStore((state) => state.addItem);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    alert(`Producto ${product.title} añadido al carrito`);
+
+    // Calcular el precio numérico desde el precio base y descuento
+    const basePrice = parseFloat(product.price.replace(/[^0-9]+/g, ""));
+    const finalPrice =
+      product.discount > 0
+        ? basePrice * (1 - product.discount / 100)
+        : basePrice;
+
+    addItem({
+      id: product.id,
+      name: product.title,
+      description: product.description,
+      price: finalPrice,
+      imageUrl: product.imagesURL[0] || "",
+      discount: product.discount,
+    });
   };
 
   return (
@@ -35,7 +52,11 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
             <svg className="w-20 h-20" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                clipRule="evenodd"
+              />
             </svg>
           </div>
         )}
@@ -54,21 +75,27 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
         <h3 className="font-semibold text-lg text-gray-900 line-clamp-1">
           {product.title}
         </h3>
-        
+
         {/* Marca y Categoría */}
         <div className="flex gap-2 text-xs text-gray-500">
-          <span className="bg-gray-100 px-2 py-1 rounded">{product.brandName}</span>
-          <span className="bg-gray-100 px-2 py-1 rounded">{product.categoryName}</span>
+          <span className="bg-gray-100 px-2 py-1 rounded">
+            {product.brandName}
+          </span>
+          <span className="bg-gray-100 px-2 py-1 rounded">
+            {product.categoryName}
+          </span>
         </div>
 
         <p className="text-gray-600 text-sm line-clamp-2 min-h-[40px]">
           {product.description}
         </p>
-        
+
         {/* Precio */}
         <div className="flex items-center gap-2">
           {product.discount > 0 && (
-            <span className="text-sm text-gray-400 line-through">{product.price}</span>
+            <span className="text-sm text-gray-400 line-through">
+              {product.price}
+            </span>
           )}
           <span className="text-2xl font-bold text-blue-600">
             {product.finalPrice}
@@ -78,13 +105,18 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
         {/* Stock y Disponibilidad */}
         <div className="flex items-center justify-between text-xs">
           <span className="text-gray-500">
-            Stock: <span className="font-semibold text-gray-700">{product.stock} unidades</span>
+            Stock:{" "}
+            <span className="font-semibold text-gray-700">
+              {product.stock} unidades
+            </span>
           </span>
-          <span className={`px-3 py-1 rounded-full font-medium ${
-            product.isAvailable 
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-red-100 text-red-800'
-          }`}>
+          <span
+            className={`px-3 py-1 rounded-full font-medium ${
+              product.isAvailable
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
             {product.stockIndicator}
           </span>
         </div>

@@ -7,3 +7,4 @@ export { Navbar } from "@/components/layout/navbar";
 
 // Common Components
 export { ProductCard } from "@/components/common/product-card";
+export { CartDrawer } from "@/components/common/cart-drawer";
