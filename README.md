@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tienda UCN – Ecommerce Platform Frontend
 
-## Getting Started
+Este proyecto consiste en una implementación simplificada del frontend de la plataforma de comercio electrónico "Tienda UCN" utilizando **Next.js**. El sistema incluye la creación de vistas, sesión de usuario y la administración del carrito de compras.
 
-First, run the development server:
+Esta página fue creada con un enfoque "mobile-first", por lo que responde a distintos tamaños de pantalla y mantiene una experiencia de usuario fluida.
+
+El sistema fue creado para que se utilice junto a una **API REST** creada con **ASP.NET Core 9**, lo cual permite la administración de los datos de los usuarios y productos.
+
+## Instalación
+
+### Requisitos previos
+
+Antes de ejecutar el proyecto, instala lo siguiente:
+
+- [Visual Studio Code 1.89.1+](https://code.visualstudio.com/)
+- [Node.js](https://nodejs.org/es/download)
+- [Git 2.45.1+](https://git-scm.com/downloads)
+
+Además se debe seguir las instrucciones del archivo README del siguiente repositorio:
+
+- [Repositorio Backend](https://github.com/Fabrisio-Huayllas/Taller-E-Commerce---Tienda-UCN-.git)
+
+Ya que este será necesario para el funcionamiento completo del proyecto.
+
+### Pasos de instalación
+
+1. **Clona este repositorio utilizando CMD:**
+
+   ```bash
+   git clone https://github.com/Fabrisio-Huayllas/Taller-E-Commerce-Tienda-UCN-Frontend
+   ```
+
+2. **Navega al directorio del proyecto:**
+
+   ```bash
+   cd Taller-E-Commerce-Tienda-UCN-Frontend
+   ```
+
+3. **Abre el proyecto en Visual Studio Code:**
+
+   ```bash
+   code .
+   ```
+
+4. Copia el contenido de `.env.example` en el archivo `.env.local`.
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+5. En el archivo `.env.local`, reemplaza `your-api-url-here` en el campo `NEXT_PUBLIC_API_URL` con la URL base de tu API entre comillas (“ ”) para evitar errores al leer el archivo `.env.local`. Si no conoces la URL de tu backend, ve al [repositorio de la API](https://github.com/Fabrisio-Huayllas/Taller-E-Commerce---Tienda-UCN-.git) y verifica el puerto en donde la API se está ejecutando.
+
+   ```bash
+   NEXT_PUBLIC_API_URL=your-api-url-here
+   ```
+
+6. Crea tu NextAuth secret utilizando el comando:
+
+   ```bash
+   npx auth secret
+   ```
+
+   Este comando verá que ya tienes una variable para `AUTH_SECRET` (en este caso, esa variable es `NEXTAUTH_SECRET`) en tu archivo `.env.local`, por lo que debes ingresar `y` cuando pregunte **`Overwrite existing AUTH_SECRET? (y/N)`**.
+
+Si no se ha escrito directamente en tu `.env.local`, revisa si el secret fue escrito en la consola y después copialo y reemplaza `your-auth-secret-here` en el campo `NEXTAUTH_SECRET`. Como en el paso anterior, deja el secret en comillas para evitar errores al leerlo.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+NEXTAUTH_SECRET=your-auth-secret-here
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+7. Restaura las dependencias en un terminal de Visual Studio Code.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   ```bash
+   npm i
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+8. Ejecuta el proyecto en modo desarrollador utilizando el mismo terminal.
 
-## Learn More
+   ```bash
+   npm run dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+   Una vez que ya hayas seguido estos pasos, el proyecto se ejecutara en `http://localhost:3000`. Para ver el sitio, presiona `ctrl` y abre la dirección en tu navegador.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Integrantes del grupo
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Sebastian Hernandez** - 21.701.267-8 - sebastian.hernandez02@alumnos.ucn.cl
+- **Fabrisio Huayllas** - 22.108.928-6 - fabrisio.huayllas02@alumnos.ucn.cl
+- **Rodrigo Tapia** - 21.382.034-6 - rodrigo04@alumnos.ucn.cl
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Licencia
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Este proyecto es desarrollado con fines académicos para la Universidad Católica del Norte.
