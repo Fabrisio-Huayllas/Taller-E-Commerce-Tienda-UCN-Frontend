@@ -23,21 +23,46 @@ export const Navbar = () => {
     <nav className="bg-white dark:bg-background shadow-md fixed w-full z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
         {/* Logo */}
-        <div className="font-bold text-2xl">Tienda UCN</div>
+        <Link
+          href="/"
+          className="font-bold text-2xl hover:text-blue-600 transition-colors"
+        >
+          Tienda UCN
+        </Link>
 
         {/* Menu desktop */}
         <ul className="hidden md:flex space-x-8 font-medium items-center">
           <li>
-            <Link href="/">Inicio</Link>
+            <Link
+              href="/"
+              className="hover:text-blue-600 transition-colors cursor-pointer"
+            >
+              Inicio
+            </Link>
           </li>
           <li>
-            <Link href="/products">Productos</Link>
+            <Link
+              href="/products"
+              className="hover:text-blue-600 transition-colors cursor-pointer"
+            >
+              Productos
+            </Link>
           </li>
           <li>
-            <Link href="/services">Servicios</Link>
+            <Link
+              href="/services"
+              className="hover:text-blue-600 transition-colors cursor-pointer"
+            >
+              Servicios
+            </Link>
           </li>
           <li>
-            <Link href="/contact">Contacto</Link>
+            <Link
+              href="/contact"
+              className="hover:text-blue-600 transition-colors cursor-pointer"
+            >
+              Contacto
+            </Link>
           </li>
 
           {/* Login */}
@@ -80,22 +105,38 @@ export const Navbar = () => {
         <div className="md:hidden flex flex-col items-center space-y-4 py-4 bg-white dark:bg-background shadow-md">
           <ul className="text-center space-y-3 font-medium">
             <li>
-              <Link href="/" onClick={toggleMenu}>
+              <Link
+                href="/"
+                onClick={toggleMenu}
+                className="hover:text-blue-600 transition-colors cursor-pointer block py-2"
+              >
                 Inicio
               </Link>
             </li>
             <li>
-              <Link href="/products" onClick={toggleMenu}>
+              <Link
+                href="/products"
+                onClick={toggleMenu}
+                className="hover:text-blue-600 transition-colors cursor-pointer block py-2"
+              >
                 Productos
               </Link>
             </li>
             <li>
-              <Link href="/services" onClick={toggleMenu}>
+              <Link
+                href="/services"
+                onClick={toggleMenu}
+                className="hover:text-blue-600 transition-colors cursor-pointer block py-2"
+              >
                 Servicios
               </Link>
             </li>
             <li>
-              <Link href="/contact" onClick={toggleMenu}>
+              <Link
+                href="/contact"
+                onClick={toggleMenu}
+                className="hover:text-blue-600 transition-colors cursor-pointer block py-2"
+              >
                 Contacto
               </Link>
             </li>

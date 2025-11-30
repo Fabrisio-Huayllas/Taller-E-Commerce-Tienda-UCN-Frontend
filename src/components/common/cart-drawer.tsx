@@ -4,6 +4,8 @@ import { useCartStore } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
+import { Toast } from "@/components/ui/toast";
 
 export const CartDrawer = ({
   isOpen,
@@ -14,6 +16,10 @@ export const CartDrawer = ({
 }) => {
   const { items, removeItem, updateQuantity, clearCart, getTotalPrice } =
     useCartStore();
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "error" | "success";
+  } | null>(null);
 
   if (!isOpen) return null;
 
@@ -75,6 +81,9 @@ export const CartDrawer = ({
                           <span className="text-lg font-semibold text-blue-600 dark:text-blue-400">
                             ${item.price.toLocaleString()}
                           </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            (Stock: {item.stock})
+                          </span>
                         </div>
                         <div className="flex items-center gap-2 mt-2">
                           <Button
@@ -85,6 +94,7 @@ export const CartDrawer = ({
                             }
                             disabled={item.quantity <= 1}
                             className="h-7 w-7 p-0"
+                            title="Disminuir cantidad"
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
@@ -94,10 +104,33 @@ export const CartDrawer = ({
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity + 1)
-                            }
+                            onClick={() => {
+                              const newQuantity = item.quantity + 1;
+                              if (newQuantity <= item.stock) {
+                                const result = updateQuantity(
+                                  item.id,
+                                  newQuantity,
+                                );
+                                if (!result.success && result.message) {
+                                  setToast({
+                                    message: result.message,
+                                    type: "error",
+                                  });
+                                }
+                              } else {
+                                setToast({
+                                  message: `Se alcanzó el máximo de stock disponible (${item.stock} unidades)`,
+                                  type: "error",
+                                });
+                              }
+                            }}
+                            disabled={item.quantity >= item.stock}
                             className="h-7 w-7 p-0"
+                            title={
+                              item.quantity >= item.stock
+                                ? `Stock máximo: ${item.stock}`
+                                : "Aumentar cantidad"
+                            }
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
@@ -146,6 +179,14 @@ export const CartDrawer = ({
           )}
         </div>
       </div>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </>
   );
 };
