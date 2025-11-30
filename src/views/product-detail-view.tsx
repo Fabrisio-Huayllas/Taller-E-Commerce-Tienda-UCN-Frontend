@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useProductDetail } from "@/hooks/useProductDetail";
 import { useCartStore } from "@/stores/cartStore";
+import { Toast } from "@/components/ui/toast";
 
 interface ProductDetailViewProps {
   productId: number;
@@ -17,6 +18,10 @@ export default function ProductDetailView({
   const [selectedImage, setSelectedImage] = useState(0);
   const [imageError, setImageError] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "error" | "success";
+  } | null>(null);
   const addItem = useCartStore((state) => state.addItem);
 
   const handleAddToCart = () => {
@@ -28,15 +33,36 @@ export default function ProductDetailView({
           ? basePrice * (1 - product.discount / 100)
           : basePrice;
 
+      let successCount = 0;
+      let lastError = null;
+
       for (let i = 0; i < quantity; i++) {
-        addItem({
+        const result = addItem({
           id: product.id,
           name: product.title,
           description: product.description,
           price: finalPrice,
           imageUrl: product.imagesURL[0] || "",
+          stock: product.stock,
           discount: product.discount,
         });
+
+        if (result.success) {
+          successCount++;
+        } else {
+          lastError = result.message;
+          break; // Detener si llegamos al límite
+        }
+      }
+
+      if (lastError) {
+        setToast({ message: lastError, type: "error" });
+      } else if (successCount > 0) {
+        setToast({
+          message: `${successCount} producto(s) agregado(s) al carrito`,
+          type: "success",
+        });
+        setQuantity(1); // Resetear cantidad después de agregar
       }
     }
   };
@@ -328,6 +354,14 @@ export default function ProductDetailView({
           </div>
         </div>
       </div>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }
