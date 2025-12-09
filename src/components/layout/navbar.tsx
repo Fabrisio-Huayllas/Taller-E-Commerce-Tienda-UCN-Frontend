@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { UserIcon, MenuIcon, XIcon, ShoppingCart } from "lucide-react";
+import { UserIcon, MenuIcon, XIcon, ShoppingCart, LogOut } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { CartDrawer } from "@/components/common/cart-drawer";
 import { useCartStore } from "@/stores/cartStore";
+import { toast } from "sonner";
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -13,11 +15,22 @@ export const Navbar = () => {
   const [mounted, setMounted] = useState(false);
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const totalItems = useCartStore((state) => state.getTotalItems());
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut({ callbackUrl: "/" });
+      toast.success("Sesión cerrada exitosamente");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_error) {
+      toast.error("Error al cerrar sesión");
+    }
+  };
 
   return (
     <nav className="bg-white dark:bg-background shadow-md fixed w-full z-10">
@@ -65,14 +78,50 @@ export const Navbar = () => {
             </Link>
           </li>
 
-          {/* Login */}
-          <li>
-            <Link href="/login">
-              <Button className="ml-4 flex gap-2 items-center">
-                <UserIcon size={18} /> Iniciar Sesión
-              </Button>
-            </Link>
-          </li>
+          {/* Auth buttons */}
+          {mounted && status === "loading" ? (
+            <li>
+              <div className="ml-4 h-10 w-24 animate-pulse bg-gray-200 rounded"></div>
+            </li>
+          ) : session?.user ? (
+            <>
+              {/* Mostrar nombre del usuario */}
+              <li className="text-sm text-gray-700 dark:text-gray-300">
+                Hola, {session.user.name?.split(" ")[0]}
+              </li>
+
+              {/* Botón admin (solo si es admin) */}
+              {session.user.role === "Admin" && (
+                <li>
+                  <Link href="/admin/products">
+                    <Button variant="outline" size="sm">
+                      Panel Admin
+                    </Button>
+                  </Link>
+                </li>
+              )}
+
+              {/* Botón logout */}
+              <li>
+                <Button
+                  onClick={handleLogout}
+                  variant="ghost"
+                  size="sm"
+                  className="ml-4 flex gap-2 items-center"
+                >
+                  <LogOut size={18} /> Cerrar Sesión
+                </Button>
+              </li>
+            </>
+          ) : (
+            <li>
+              <Link href="/auth/login">
+                <Button className="ml-4 flex gap-2 items-center">
+                  <UserIcon size={18} /> Iniciar Sesión
+                </Button>
+              </Link>
+            </li>
+          )}
 
           {/* Carrito */}
           <li>
@@ -141,14 +190,49 @@ export const Navbar = () => {
               </Link>
             </li>
 
-            {/* Login en móvil */}
-            <li className="w-full px-6">
-              <Link href="/login" onClick={toggleMenu}>
-                <Button className="w-full flex gap-2 items-center rounded-full">
-                  <UserIcon size={18} /> Iniciar Sesión
-                </Button>
-              </Link>
-            </li>
+            {/* Auth buttons en móvil */}
+            {mounted && status === "loading" ? (
+              <li className="w-full px-6">
+                <div className="h-10 animate-pulse bg-gray-200 rounded"></div>
+              </li>
+            ) : session?.user ? (
+              <>
+                <li className="text-sm text-gray-700 dark:text-gray-300 py-2">
+                  Hola, {session.user.name?.split(" ")[0]}
+                </li>
+
+                {session.user.role === "Admin" && (
+                  <li className="w-full px-6">
+                    <Link href="/admin/products" onClick={toggleMenu}>
+                      <Button className="w-full" variant="outline">
+                        Panel Admin
+                      </Button>
+                    </Link>
+                  </li>
+                )}
+
+                <li className="w-full px-6">
+                  <Button
+                    onClick={() => {
+                      toggleMenu();
+                      handleLogout();
+                    }}
+                    className="w-full flex gap-2 items-center"
+                    variant="ghost"
+                  >
+                    <LogOut size={18} /> Cerrar Sesión
+                  </Button>
+                </li>
+              </>
+            ) : (
+              <li className="w-full px-6">
+                <Link href="/auth/login" onClick={toggleMenu}>
+                  <Button className="w-full flex gap-2 items-center rounded-full">
+                    <UserIcon size={18} /> Iniciar Sesión
+                  </Button>
+                </Link>
+              </li>
+            )}
 
             {/* Carrito en móvil */}
             <li className="w-full px-6">
