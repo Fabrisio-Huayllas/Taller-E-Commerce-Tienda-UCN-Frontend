@@ -194,15 +194,30 @@ export default function RegisterView() {
               >
                 <SelectTrigger
                   id="gender"
-                  className="mt-1"
+                  className="mt-1 bg-gray-100 text-black"
                   aria-invalid={!!errors.gender}
                 >
                   <SelectValue placeholder="Seleccione género" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Masculino">Masculino</SelectItem>
-                  <SelectItem value="Femenino">Femenino</SelectItem>
-                  <SelectItem value="Otro">Otro</SelectItem>
+                <SelectContent className="bg-white">
+                  <SelectItem
+                    value="Masculino"
+                    className="text-black hover:bg-gray-100"
+                  >
+                    Masculino
+                  </SelectItem>
+                  <SelectItem
+                    value="Femenino"
+                    className="text-black hover:bg-gray-100"
+                  >
+                    Femenino
+                  </SelectItem>
+                  <SelectItem
+                    value="Otro"
+                    className="text-black hover:bg-gray-100"
+                  >
+                    Otro
+                  </SelectItem>
                 </SelectContent>
               </Select>
               {errors.gender && (

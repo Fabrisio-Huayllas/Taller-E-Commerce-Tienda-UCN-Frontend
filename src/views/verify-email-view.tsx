@@ -179,10 +179,10 @@ export default function VerifyEmailView() {
 
             <Button
               type="button"
-              variant="outline"
+              variant={canResend ? "secondary" : "outline"}
               onClick={handleResendCode}
               disabled={!canResend || isResending}
-              className="w-full"
+              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 border-gray-300"
             >
               {isResending ? (
                 <>
