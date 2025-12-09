@@ -12,6 +12,7 @@ import { loginSchema, type LoginFormData } from "@/lib/validations/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Link from "next/link";
 
 /**
  * Vista de Login con React Hook Form, Zod y NextAuth
@@ -253,12 +254,12 @@ export default function LoginView() {
           <div className="text-center text-sm">
             <p className="text-gray-600">
               ¿No tienes una cuenta?{" "}
-              <a
+              <Link
                 href="/auth/register"
                 className="font-medium text-primary hover:underline"
               >
                 Regístrate aquí
-              </a>
+              </Link>
             </p>
           </div>
         </form>
