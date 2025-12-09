@@ -5,7 +5,7 @@
     "type": true
   },
   "tags": ["-lintignore"],
-  "ignoreDependencies": [],
+  "ignoreDependencies": ["tailwindcss", "tw-animate-css"],
   "ignoreBinaries": [],
   "entry": ["src/app/**/*.{ts,tsx}", "!src/app/**/*.test.{ts,tsx}"],
   "project": ["src/**/*.{ts,tsx}"],
