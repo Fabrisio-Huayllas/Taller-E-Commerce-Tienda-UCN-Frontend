@@ -37,10 +37,11 @@ export interface ResendCodeResponse {
   data: string;
 }
 
-export interface ApiErrorResponse {
-  type: string;
-  title: string;
-  status: number;
-  errors?: Record<string, string[]>;
-  traceId?: string;
-}
+// ⭐ COMENTAR ESTO (no se usa)
+// export interface ApiErrorResponse {
+//   type: string;
+//   title: string;
+//   status: number;
+//   errors?: Record<string, string[]>;
+//   traceId?: string;
+// }
