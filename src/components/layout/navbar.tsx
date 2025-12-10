@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { UserIcon, MenuIcon, XIcon, ShoppingCart, LogOut } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -13,9 +14,13 @@ export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const totalItems = useCartStore((state) => state.getTotalItems());
   const { data: session, status } = useSession();
+
+  // Deshabilitar carrito si estamos en /cart o /checkout
+  const isInCartPage = pathname === "/cart" || pathname === "/checkout";
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -126,8 +131,14 @@ export const Navbar = () => {
           {/* Carrito */}
           <li>
             <button
-              onClick={() => setCartOpen(true)}
-              className="relative flex items-center hover:text-blue-600 transition-colors"
+              onClick={() => !isInCartPage && setCartOpen(true)}
+              disabled={isInCartPage}
+              className={`relative flex items-center transition-colors ${
+                isInCartPage
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:text-blue-600 cursor-pointer"
+              }`}
+              title={isInCartPage ? "Ya estás en el carrito" : "Ver carrito"}
             >
               <ShoppingCart className="h-6 w-6" />
               {mounted && totalItems > 0 && (
@@ -238,15 +249,23 @@ export const Navbar = () => {
             <li className="w-full px-6">
               <Button
                 onClick={() => {
-                  setCartOpen(true);
-                  toggleMenu();
+                  if (!isInCartPage) {
+                    setCartOpen(true);
+                    toggleMenu();
+                  }
                 }}
-                className="w-full flex gap-2 items-center rounded-full"
+                disabled={isInCartPage}
+                className={`w-full flex gap-2 items-center rounded-full ${
+                  isInCartPage
+                    ? "opacity-50 cursor-not-allowed"
+                    : "cursor-pointer"
+                }`}
                 variant="outline"
+                title={isInCartPage ? "Ya estás en el carrito" : "Ver carrito"}
               >
                 <ShoppingCart size={18} />
-                Carrito
-                {mounted && totalItems > 0 && (
+                {isInCartPage ? "Estás en el carrito" : "Carrito"}
+                {mounted && totalItems > 0 && !isInCartPage && (
                   <span className="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                     {totalItems}
                   </span>
