@@ -6,6 +6,7 @@ import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Toast } from "@/components/ui/toast";
+import { useRouter } from "next/navigation";
 
 export const CartDrawer = ({
   isOpen,
@@ -14,6 +15,7 @@ export const CartDrawer = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
+  const router = useRouter();
   const { items, removeItem, updateQuantity, clearCart, getTotalPrice } =
     useCartStore();
   const [toast, setToast] = useState<{
@@ -24,6 +26,11 @@ export const CartDrawer = ({
   if (!isOpen) return null;
 
   const total = getTotalPrice();
+
+  const handleViewCart = () => {
+    onClose();
+    router.push("/cart");
+  };
 
   return (
     <>
@@ -162,14 +169,15 @@ export const CartDrawer = ({
               </div>
               <div className="space-y-2">
                 <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
                   size="lg"
+                  onClick={handleViewCart}
                 >
-                  Proceder al Pago
+                  Ver detalles del carrito
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  className="w-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
                   onClick={clearCart}
                 >
                   Vaciar Carrito
