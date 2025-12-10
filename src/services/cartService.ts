@@ -23,10 +23,11 @@ export interface CartResponse {
   message: string;
 }
 
-export interface UpdateQuantityRequest {
-  productId: number;
-  quantity: number;
-}
+// Interface para futuro uso si se necesita validación de request
+// interface UpdateQuantityRequest {
+//   productId: number;
+//   quantity: number;
+// }
 
 export interface CheckoutResponse {
   data: {
@@ -109,8 +110,10 @@ export async function getCart(): Promise<CartResponse> {
 
 /**
  * Agrega un producto al carrito
+ * NOTA: Actualmente no se usa porque se agrega desde cartStore directamente,
+ * pero se mantiene para futuro uso si se necesita agregar desde el backend
  */
-export async function addToCart(
+/* export async function addToCart(
   productId: number,
   quantity: number = 1,
 ): Promise<CartResponse> {
@@ -152,7 +155,7 @@ export async function addToCart(
     }
     throw new Error("Error de conexión con el servidor");
   }
-}
+} */
 
 /**
  * Actualiza la cantidad de un producto en el carrito
