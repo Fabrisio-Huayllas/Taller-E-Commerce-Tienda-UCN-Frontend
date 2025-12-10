@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
@@ -50,14 +50,17 @@ export default function CartView() {
   });
 
   const [clearDialog, setClearDialog] = useState(false);
+  const hasSyncedRef = useRef(false);
 
-  // Solo sincronizar si el usuario está autenticado
+  // Solo sincronizar una vez cuando el usuario está autenticado
   useEffect(() => {
-    if (status === "authenticated") {
-      console.log("Usuario autenticado, sincronizando con backend...");
+    if (status === "authenticated" && !hasSyncedRef.current) {
+      console.log("🔄 Usuario autenticado, sincronizando con backend...");
+      hasSyncedRef.current = true;
       syncCart();
     } else if (status === "unauthenticated") {
-      console.log("Usuario no autenticado, usando carrito local");
+      console.log("📜 Usando carrito local (sin autenticación)");
+      hasSyncedRef.current = false; // Reset para permitir sync en próximo login
     }
   }, [status, syncCart]);
 

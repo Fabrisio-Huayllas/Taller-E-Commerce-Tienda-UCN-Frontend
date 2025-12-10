@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useCartStore } from "@/stores/cartStore";
 import {
   getCart,
@@ -29,7 +29,7 @@ export function useCart() {
   // NO sincronizar automáticamente al montar para preservar el carrito local
   // Solo sincronizar explícitamente cuando el usuario esté autenticado
 
-  const syncCart = async () => {
+  const syncCart = useCallback(async () => {
     setLoading(true);
     setSyncError(null);
 
@@ -37,13 +37,18 @@ export function useCart() {
       const response = await getCart();
       const cartItems = mapCartResponseToItems(response);
 
-      // Solo actualizar si hay items en el backend O si el carrito local está vacío
-      if (cartItems.length > 0 || items.length === 0) {
+      // Si hay items en el backend, usar esos
+      if (cartItems.length > 0) {
         setItems(cartItems);
-      } else {
-        // Si el backend está vacío pero hay items locales, mantener locales
         console.log(
-          "Backend vacío, manteniendo carrito local con",
+          "✅ Carrito sincronizado con backend:",
+          cartItems.length,
+          "items",
+        );
+      } else {
+        // Si el backend está vacío, mantener el carrito local
+        console.log(
+          "📦 Backend vacío, manteniendo carrito local con",
           items.length,
           "items",
         );
@@ -62,7 +67,7 @@ export function useCart() {
       ) {
         // Mantener items locales sin mostrar error
         console.log(
-          "Usuario no autenticado, manteniendo carrito local con",
+          "🔒 Usuario no autenticado, manteniendo carrito local con",
           items.length,
           "items",
         );
@@ -70,7 +75,7 @@ export function useCart() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [setLoading, setSyncError, setItems, items.length]);
 
   return {
     items,
