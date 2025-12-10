@@ -14,12 +14,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Toast } from "@/components/ui/toast";
 import { useCart, useCheckout } from "@/hooks/useCart";
+import { useCartStore } from "@/stores/cartStore";
 
 export default function CheckoutView() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const { items, isLoading, totalItems, totalPrice } = useCart();
   const { mutate: processCheckout, isProcessing } = useCheckout();
+  const { clearCart } = useCartStore();
 
   const [toast, setToast] = useState<{
     message: string;
@@ -61,7 +63,7 @@ export default function CheckoutView() {
         return;
       }
 
-      if (!isLoading && items.length === 0) {
+      if (!isLoading && items.length === 0 && !orderSuccess) {
         setToast({
           message: "El carrito está vacío",
           type: "warning",
@@ -74,9 +76,12 @@ export default function CheckoutView() {
     }, 0);
 
     return () => clearTimeout(timer);
-  }, [status, session, items, isLoading, router]);
+  }, [status, session, items, isLoading, router, orderSuccess]);
 
   const handleCheckout = async () => {
+    console.log("🛒 Iniciando proceso de checkout...");
+    console.log("📦 Items en carrito:", items);
+
     // Validación final de stock
     const outOfStock = items.filter((item) => item.quantity > item.stock);
     if (outOfStock.length > 0) {
@@ -88,20 +93,35 @@ export default function CheckoutView() {
     }
 
     const result = await processCheckout();
+    console.log("📋 Resultado del checkout:", result);
+    console.log("📦 Data recibida:", result.data);
 
     if (result.success) {
+      // Primero establecer el éxito de la orden
       setOrderSuccess(true);
-      setOrderData(result.data);
-      setToast({
-        message: "¡Compra realizada exitosamente!",
-        type: "success",
+
+      // Mapear los datos correctamente según lo que devuelve el backend
+      // El backend devuelve solo el código de orden como string en result.data
+      const orderCode = result.data as unknown as string;
+      setOrderData({
+        orderId: 0, // No tenemos el ID numérico
+        orderNumber: orderCode || "N/A",
+        totalAmount: totalPrice, // Usar el total calculado del carrito local
       });
 
-      // Redirigir a la página de órdenes después de 3 segundos
+      // Luego limpiar el carrito DESPUÉS de que orderSuccess sea true
+      // Esto evita que el useEffect redirija antes de mostrar la pantalla de éxito
       setTimeout(() => {
-        router.push(`/orders/${result.data?.orderId}`);
-      }, 3000);
+        clearCart();
+      }, 100);
+
+      setToast({
+        message: "¡Orden creada exitosamente!",
+        type: "success",
+      });
+      // No redirigir automáticamente, dejar que el usuario elija
     } else {
+      console.error("❌ Error en checkout:", result.message);
       setToast({
         message: result.message || "Error al procesar la compra",
         type: "error",
@@ -161,11 +181,11 @@ export default function CheckoutView() {
             </div>
 
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              ¡Compra realizada con éxito!
+              ¡Orden creada con éxito!
             </h1>
 
             <p className="text-gray-600 dark:text-gray-400 mb-2">
-              Tu pedido ha sido procesado correctamente
+              Tu orden ha sido registrada correctamente
             </p>
 
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
@@ -189,22 +209,25 @@ export default function CheckoutView() {
             </div>
 
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-              Recibirás un correo de confirmación con los detalles de tu pedido
+              Gracias por comprar en Tienda UCN.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button
-                onClick={() => router.push(`/orders/${orderData.orderId}`)}
+                onClick={() => router.push("/")}
                 className="cursor-pointer"
               >
-                Ver detalles del pedido
+                Volver al inicio
               </Button>
               <Button
                 variant="outline"
-                onClick={() => router.push("/products")}
+                onClick={() => {
+                  // TODO: Implementar navegación a página de órdenes
+                  console.log("Navegar a mis órdenes");
+                }}
                 className="cursor-pointer"
               >
-                Continuar comprando
+                Ver mis órdenes
               </Button>
             </div>
           </div>
@@ -220,10 +243,10 @@ export default function CheckoutView() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
             <CreditCard className="h-8 w-8 text-blue-600" />
-            Finalizar Compra
+            Finalizar Orden
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Revisa tu pedido y confirma la compra
+            Revisa tu pedido y confirma tu orden
           </p>
         </div>
 
@@ -313,7 +336,7 @@ export default function CheckoutView() {
                   <strong>Usuario:</strong> {session?.user?.email}
                 </p>
                 <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
-                  El envío se realizará a la dirección registrada en tu cuenta.
+                  La orden esta registrada solo al dueño de esta cuenta cuenta.
                 </p>
               </div>
             </div>
@@ -378,12 +401,12 @@ export default function CheckoutView() {
                 {isProcessing ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Procesando...
+                    Creando orden...
                   </>
                 ) : (
                   <>
-                    <CreditCard className="mr-2 h-5 w-5" />
-                    Confirmar compra
+                    <ShoppingBag className="mr-2 h-5 w-5" />
+                    Crear orden
                   </>
                 )}
               </Button>

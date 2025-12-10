@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { useCartStore } from "@/stores/cartStore";
 import {
   getCart,
@@ -9,9 +10,11 @@ import {
   clearCartAPI,
   checkoutCart,
   mapCartResponseToItems,
+  syncCartToBackend,
 } from "@/services/cartService";
 
 export function useCart() {
+  const { data: session } = useSession();
   const {
     items,
     isLoading,
@@ -34,7 +37,8 @@ export function useCart() {
     setSyncError(null);
 
     try {
-      const response = await getCart();
+      const token = session?.accessToken;
+      const response = await getCart(token);
       const cartItems = mapCartResponseToItems(response);
 
       // Si hay items en el backend, usar esos
@@ -75,7 +79,7 @@ export function useCart() {
     } finally {
       setLoading(false);
     }
-  }, [setLoading, setSyncError, setItems, items.length]);
+  }, [setLoading, setSyncError, setItems, items.length, session]);
 
   return {
     items,
@@ -320,19 +324,29 @@ export function useClearCart() {
 }
 
 export function useCheckout() {
+  const { data: session } = useSession();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { clearCart } = useCartStore();
+  const { items } = useCartStore();
 
   const mutate = async () => {
     setIsProcessing(true);
     setError(null);
 
     try {
-      const response = await checkoutCart();
+      const token = session?.accessToken;
+      console.log("🔑 Token disponible para checkout:", token ? "Sí" : "No");
 
-      // Limpiar carrito local después de checkout exitoso
-      clearCart();
+      // Primero sincronizar el carrito local con el backend
+      console.log("🔄 Sincronizando carrito antes de checkout...");
+      await syncCartToBackend(items, token);
+
+      // Luego hacer el checkout
+      console.log("🛒 Realizando checkout...");
+      const response = await checkoutCart(token);
+
+      // NO limpiar el carrito aquí, lo hará el componente después de establecer orderSuccess
+      // clearCart();
 
       return {
         success: true,

@@ -65,7 +65,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 ] || (credentials.email as string),
               name:
                 payload[
-                  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+                  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
                 ] || (credentials.email as string),
               role:
                 payload[

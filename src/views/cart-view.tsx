@@ -467,7 +467,7 @@ export default function CartView() {
                 className="w-full cursor-pointer mb-3"
                 size="lg"
               >
-                Proceder al pago
+                Confirmar productos
               </Button>
 
               <Button

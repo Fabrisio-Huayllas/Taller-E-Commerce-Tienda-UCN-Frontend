@@ -1,6 +1,22 @@
 import { CartItem } from "@/models/cart";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5043/api";
+
+/**
+ * Construye los headers para las peticiones con autenticación
+ */
+function buildHeaders(token?: string | null): HeadersInit {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  return headers;
+}
 
 export interface CartResponse {
   data: {
@@ -43,15 +59,23 @@ export interface CheckoutResponse {
 /**
  * Obtiene el carrito del usuario autenticado
  */
-export async function getCart(): Promise<CartResponse> {
+export async function getCart(token?: string | null): Promise<CartResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/cart`, {
+    console.log("🔍 Obteniendo carrito del backend...");
+    console.log("🍪 Cookies disponibles:", document.cookie);
+    console.log("🔑 Token disponible:", token ? "Sí" : "No");
+
+    const response = await fetch(`${API_BASE_URL}/cart`, {
       method: "GET",
       credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: buildHeaders(token),
     });
+
+    console.log(
+      "📡 Respuesta GET /cart:",
+      response.status,
+      response.statusText,
+    );
 
     if (!response.ok) {
       // Si no hay contenido (204) o está vacío, devolver carrito vacío
@@ -70,6 +94,7 @@ export async function getCart(): Promise<CartResponse> {
 
       // Intentar parsear error
       const text = await response.text();
+      console.error("❌ Error response:", text);
       let errorMessage = "Error al obtener el carrito";
 
       if (text) {
@@ -165,17 +190,16 @@ export async function updateCartItemQuantity(
   quantity: number,
 ): Promise<CartResponse> {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/api/cart/items/${productId}`,
-      {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ quantity }),
-      },
-    );
+    // El backend espera FormData con PATCH method
+    const formData = new FormData();
+    formData.append("productId", productId.toString());
+    formData.append("quantity", quantity.toString());
+
+    const response = await fetch(`${API_BASE_URL}/cart/items`, {
+      method: "PATCH",
+      credentials: "include",
+      body: formData,
+    });
 
     if (!response.ok) {
       const text = await response.text();
@@ -214,16 +238,13 @@ export async function removeCartItem(
   productId: number,
 ): Promise<{ message: string }> {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/api/cart/items/${productId}`,
-      {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+    const response = await fetch(`${API_BASE_URL}/cart/items/${productId}`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+    });
 
     if (!response.ok) {
       const text = await response.text();
@@ -260,8 +281,8 @@ export async function removeCartItem(
  */
 export async function clearCartAPI(): Promise<{ message: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/cart`, {
-      method: "DELETE",
+    const response = await fetch(`${API_BASE_URL}/cart/clear`, {
+      method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
@@ -299,26 +320,119 @@ export async function clearCartAPI(): Promise<{ message: string }> {
 }
 
 /**
+ * Sincroniza el carrito local con el backend
+ * Envía todos los items locales al backend antes de hacer checkout
+ */
+export async function syncCartToBackend(
+  items: CartItem[],
+  token?: string | null,
+): Promise<void> {
+  console.log("🔄 Sincronizando carrito con backend:", items.length, "items");
+  console.log("🔑 Token para sincronización:", token ? "Sí" : "No");
+
+  try {
+    // Paso 1: Crear o obtener el carrito en el backend
+    console.log("📦 Creando/obteniendo carrito en backend...");
+    const cartResponse = await fetch(`${API_BASE_URL}/cart`, {
+      method: "GET",
+      credentials: "include",
+      headers: buildHeaders(token),
+    });
+
+    console.log("📡 Respuesta GET /api/cart:", {
+      status: cartResponse.status,
+      statusText: cartResponse.statusText,
+      ok: cartResponse.ok,
+    });
+
+    if (!cartResponse.ok) {
+      const text = await cartResponse.text();
+      console.error("❌ Error response body:", text);
+      throw new Error(
+        `Error al crear/obtener carrito (${cartResponse.status}): ${text}`,
+      );
+    }
+
+    const cartText = await cartResponse.text();
+    console.log(
+      "✅ Carrito obtenido/creado en backend:",
+      cartText.substring(0, 200),
+    );
+
+    // Paso 2: Agregar cada item al backend (el backend manejará duplicados)
+    for (const item of items) {
+      console.log(
+        `➕ Agregando ${item.name} (x${item.quantity}) al backend...`,
+      );
+
+      // El backend espera FormData, no JSON
+      const formData = new FormData();
+      formData.append("productId", item.id.toString());
+      formData.append("quantity", item.quantity.toString());
+
+      const headers: HeadersInit = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/cart/items`, {
+        method: "POST",
+        credentials: "include",
+        headers: headers,
+        body: formData, // No incluir Content-Type header, el browser lo establece automáticamente
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.error(`❌ Error al agregar ${item.name}:`, text);
+
+        // Si el item ya existe, intentar actualizar la cantidad
+        if (text.includes("ya existe") || response.status === 409) {
+          console.log(`🔄 Actualizando cantidad de ${item.name}...`);
+          await updateCartItemQuantity(item.id, item.quantity);
+        } else {
+          throw new Error(`Error al agregar ${item.name}: ${text}`);
+        }
+      }
+    }
+
+    console.log("✅ Carrito sincronizado exitosamente con el backend");
+  } catch (error) {
+    console.error("❌ Error al sincronizar carrito:", error);
+    throw new Error("No se pudo sincronizar el carrito con el servidor");
+  }
+}
+
+/**
  * Realiza el checkout del carrito
  */
-export async function checkoutCart(): Promise<CheckoutResponse> {
+export async function checkoutCart(
+  token?: string | null,
+): Promise<CheckoutResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/orders`, {
+    console.log("🛒 Iniciando checkout...");
+    console.log("🔑 Token para checkout:", token ? "Sí" : "No");
+    const response = await fetch(`${API_BASE_URL}/orders/create`, {
       method: "POST",
       credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: buildHeaders(token),
     });
+
+    console.log(
+      "📡 Respuesta del servidor:",
+      response.status,
+      response.statusText,
+    );
 
     if (!response.ok) {
       const text = await response.text();
+      console.error("❌ Error del servidor:", text);
       let errorMessage = "Error al procesar la compra";
 
       if (text) {
         try {
           const error = JSON.parse(text);
-          errorMessage = error.message || errorMessage;
+          errorMessage = error.message || error.title || errorMessage;
         } catch {
           errorMessage = text || errorMessage;
         }
@@ -328,12 +442,17 @@ export async function checkoutCart(): Promise<CheckoutResponse> {
     }
 
     const text = await response.text();
+    console.log("📦 Respuesta cruda:", text);
+
     if (!text || text.trim() === "") {
       throw new Error("Respuesta vacía del servidor");
     }
 
-    return JSON.parse(text);
+    const result = JSON.parse(text);
+    console.log("✅ Orden creada:", result);
+    return result;
   } catch (error) {
+    console.error("💥 Error en checkoutCart:", error);
     if (error instanceof Error) {
       throw error;
     }
