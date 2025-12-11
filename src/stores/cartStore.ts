@@ -4,6 +4,10 @@ import { CartItem } from "@/models/cart";
 
 interface CartStore {
   items: CartItem[];
+  isLoading: boolean;
+  isSyncing: boolean;
+  lastSyncError: string | null;
+
   addItem: (product: Omit<CartItem, "quantity">) => {
     success: boolean;
     message?: string;
@@ -16,13 +20,24 @@ interface CartStore {
   clearCart: () => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
+  getSubtotalWithoutDiscount: () => number;
+  getTotalSavings: () => number;
   getItemStock: (productId: number) => number;
+
+  // Nuevos métodos para sincronización
+  setItems: (items: CartItem[]) => void;
+  setLoading: (loading: boolean) => void;
+  setSyncing: (syncing: boolean) => void;
+  setSyncError: (error: string | null) => void;
 }
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      isLoading: false,
+      isSyncing: false,
+      lastSyncError: null,
 
       addItem: (product) => {
         let result = { success: false, message: "" };
@@ -130,9 +145,42 @@ export const useCartStore = create<CartStore>()(
         }, 0);
       },
 
+      getSubtotalWithoutDiscount: () => {
+        return get().items.reduce((total, item) => {
+          return total + item.price * item.quantity;
+        }, 0);
+      },
+
+      getTotalSavings: () => {
+        return get().items.reduce((total, item) => {
+          if (item.discount) {
+            const savings = item.price * (item.discount / 100) * item.quantity;
+            return total + savings;
+          }
+          return total;
+        }, 0);
+      },
+
       getItemStock: (productId) => {
         const item = get().items.find((item) => item.id === productId);
         return item?.stock || 0;
+      },
+
+      // Métodos de sincronización
+      setItems: (items) => {
+        set({ items });
+      },
+
+      setLoading: (loading) => {
+        set({ isLoading: loading });
+      },
+
+      setSyncing: (syncing) => {
+        set({ isSyncing: syncing });
+      },
+
+      setSyncError: (error) => {
+        set({ lastSyncError: error });
       },
     }),
     {

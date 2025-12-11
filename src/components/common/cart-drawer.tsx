@@ -6,6 +6,8 @@ import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Toast } from "@/components/ui/toast";
+import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 
 export const CartDrawer = ({
   isOpen,
@@ -14,6 +16,7 @@ export const CartDrawer = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
+  const router = useRouter();
   const { items, removeItem, updateQuantity, clearCart, getTotalPrice } =
     useCartStore();
   const [toast, setToast] = useState<{
@@ -21,20 +24,29 @@ export const CartDrawer = ({
     type: "error" | "success";
   } | null>(null);
 
-  if (!isOpen) return null;
+  // Check if we're on the client side
+  const isBrowser = typeof window !== "undefined";
+
+  if (!isOpen || !isBrowser) return null;
 
   const total = getTotalPrice();
 
-  return (
+  const handleViewCart = () => {
+    onClose();
+    router.push("/cart");
+  };
+
+  const drawerContent = (
     <>
-      {/* Overlay - muy sutil, solo para cerrar al hacer clic */}
+      {/* Overlay backdrop */}
       <div
-        className="fixed inset-0 bg-transparent z-40 transition-opacity"
+        className="fixed inset-0 bg-black/20 dark:bg-black/40 z-[9998]"
         onClick={onClose}
+        aria-label="Cerrar carrito"
       />
 
-      {/* Drawer */}
-      <div className="fixed right-0 top-0 h-full w-full md:w-96 bg-white dark:bg-gray-900 shadow-xl z-50 transform transition-transform">
+      {/* Drawer panel */}
+      <div className="fixed right-0 top-0 h-full w-full md:w-96 bg-white dark:bg-gray-900 shadow-xl z-[9999] overflow-hidden">
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
@@ -51,7 +63,7 @@ export const CartDrawer = ({
           </div>
 
           {/* Cart Items */}
-          <div className="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-800">
+          <div className="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-800 relative">
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
                 <ShoppingBag className="h-16 w-16 mb-4 text-gray-300 dark:text-gray-600" />
@@ -63,14 +75,14 @@ export const CartDrawer = ({
                   return (
                     <div
                       key={item.id}
-                      className="flex gap-3 border-b border-gray-200 dark:border-gray-700 pb-4 bg-white dark:bg-gray-900 p-3 rounded-lg shadow-sm"
+                      className="flex gap-3 border-b border-gray-200 dark:border-gray-700 pb-4 bg-white dark:bg-gray-900 p-3 rounded-lg shadow-sm relative"
                     >
                       <div className="relative w-20 h-20 flex-shrink-0">
                         <Image
                           src={item.imageUrl || "/placeholder.jpg"}
                           alt={item.name}
                           fill
-                          className="object-cover rounded"
+                          className="object-cover rounded pointer-events-none"
                         />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -162,14 +174,15 @@ export const CartDrawer = ({
               </div>
               <div className="space-y-2">
                 <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
                   size="lg"
+                  onClick={handleViewCart}
                 >
-                  Proceder al Pago
+                  Ver detalles del carrito
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  className="w-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
                   onClick={clearCart}
                 >
                   Vaciar Carrito
@@ -189,4 +202,6 @@ export const CartDrawer = ({
       )}
     </>
   );
+
+  return createPortal(drawerContent, document.body);
 };
