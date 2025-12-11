@@ -57,31 +57,38 @@ export function OrdersFilterBar({
   };
 
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-      <div className="flex gap-2 flex-1">
-        <Input
-          placeholder="Buscar por código de orden..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyPress={handleKeyPress}
-          disabled={isLoading}
-          className="flex-1"
-        />
-        <Button onClick={handleSearch} disabled={isLoading}>
-          <Search className="w-4 h-4 mr-2" />
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex gap-2 flex-1 max-w-md">
+        <div className="relative flex-1">
+          <Input
+            placeholder="Buscar por código de orden..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyPress={handleKeyPress}
+            disabled={isLoading}
+            className="pl-10"
+          />
+          <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+        </div>
+        <Button onClick={handleSearch} disabled={isLoading} className="px-6">
           Buscar
         </Button>
       </div>
 
-      <select
-        onChange={(e) => onPageSizeChange(Number(e.target.value))}
-        disabled={isLoading}
-        className="px-3 py-2 border rounded-md text-sm text-gray-900 dark:text-white dark:bg-gray-800 dark:border-gray-700"
-      >
-        <option value={10}>10 por página</option>
-        <option value={20}>20 por página</option>
-        <option value={50}>50 por página</option>
-      </select>
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+          Mostrar:
+        </span>
+        <select
+          onChange={(e) => onPageSizeChange(Number(e.target.value))}
+          disabled={isLoading}
+          className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+        >
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+          <option value={50}>50</option>
+        </select>
+      </div>
     </div>
   );
 }

@@ -83,17 +83,17 @@ export const Navbar = () => {
             </Link>
           </li>
 
-          {/* Mis Órdenes colocado junto al resto de enlaces */}
-          <li>
-            <Link
-              href="/orders"
-              className="hover:text-gray-200 transition-colors cursor-pointer"
-            >
-              Mis Órdenes
-            </Link>
-          </li>
+          {session?.user && (
+            <li>
+              <Link
+                href="/orders"
+                className="hover:text-gray-200 transition-colors cursor-pointer"
+              >
+                Mis Órdenes
+              </Link>
+            </li>
+          )}
 
-          {/* Auth buttons */}
           {mounted && status === "loading" ? (
             <li>
               <div className="ml-4 h-10 w-24 animate-pulse bg-gray-200 rounded"></div>
@@ -105,7 +105,7 @@ export const Navbar = () => {
                 Hola, {session.user.name?.split(" ")[0]}
               </li>
 
-              {/* Botón admin (solo si es admin) */}
+              {/* Boton admin (solo si es admin) */}
               {session.user.role === "Admin" && (
                 <li>
                   <Link href="/admin/products">
@@ -116,7 +116,7 @@ export const Navbar = () => {
                 </li>
               )}
 
-              {/* Botón logout */}
+              {/* Boton logout */}
               <li>
                 <Button
                   onClick={handleLogout}
@@ -170,7 +170,7 @@ export const Navbar = () => {
         </button>
       </div>
 
-      {/* Menu móvil */}
+      {/* Menu movil */}
       {menuOpen && (
         <div className="md:hidden flex flex-col items-center space-y-4 py-4 bg-gray-900 dark:bg-gray-900 shadow-md">
           <ul className="text-center space-y-3 font-medium text-white">
@@ -211,18 +211,20 @@ export const Navbar = () => {
               </Link>
             </li>
 
-            {/* Mis Órdenes en móvil junto al resto */}
-            <li>
-              <Link
-                href="/orders"
-                onClick={toggleMenu}
-                className="hover:text-blue-600 transition-colors cursor-pointer block py-2"
-              >
-                Mis Órdenes
-              </Link>
-            </li>
+            {/* Mis Órdenes en móvil junto al resto - solo si está logueado */}
+            {session?.user && (
+              <li>
+                <Link
+                  href="/orders"
+                  onClick={toggleMenu}
+                  className="hover:text-blue-600 transition-colors cursor-pointer block py-2"
+                >
+                  Mis Órdenes
+                </Link>
+              </li>
+            )}
 
-            {/* Auth buttons en móvil */}
+            {/* Auth buttons en movil */}
             {mounted && status === "loading" ? (
               <li className="w-full px-6">
                 <div className="h-10 animate-pulse bg-gray-200 rounded"></div>
@@ -266,7 +268,7 @@ export const Navbar = () => {
               </li>
             )}
 
-            {/* Carrito en móvil */}
+            {/* Carrito en movil */}
             <li className="w-full px-6">
               <Button
                 onClick={() => {

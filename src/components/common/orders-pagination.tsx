@@ -69,42 +69,64 @@ export function OrdersPagination({
   };
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-6">
-      <Button
-        onClick={() => handlePageChange(validCurrentPage - 1)}
-        disabled={validCurrentPage === 1 || isLoading}
-        variant="outline"
-        size="sm"
-      >
-        <ChevronLeft className="w-4 h-4" />
-      </Button>
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+      <div className="text-sm text-gray-600 dark:text-gray-400">
+        Página{" "}
+        <span className="font-semibold text-gray-900 dark:text-white">
+          {validCurrentPage}
+        </span>{" "}
+        de{" "}
+        <span className="font-semibold text-gray-900 dark:text-white">
+          {validTotalPages}
+        </span>
+      </div>
 
-      {pages.map((page, idx) =>
-        page === "..." ? (
-          <span key={`ellipsis-${idx}`} className="px-2 py-1">
-            ...
-          </span>
-        ) : (
-          <Button
-            key={page}
-            onClick={() => handlePageChange(page as number)}
-            variant={page === validCurrentPage ? "default" : "outline"}
-            size="sm"
-            disabled={isLoading}
-          >
-            {page}
-          </Button>
-        ),
-      )}
+      <div className="flex items-center gap-2">
+        <Button
+          onClick={() => handlePageChange(validCurrentPage - 1)}
+          disabled={validCurrentPage === 1 || isLoading}
+          variant="outline"
+          size="sm"
+          className="h-10 w-10 p-0"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </Button>
 
-      <Button
-        onClick={() => handlePageChange(validCurrentPage + 1)}
-        disabled={validCurrentPage === validTotalPages || isLoading}
-        variant="outline"
-        size="sm"
-      >
-        <ChevronRight className="w-4 h-4" />
-      </Button>
+        <div className="flex gap-1">
+          {pages.map((page, idx) =>
+            page === "..." ? (
+              <span key={`ellipsis-${idx}`} className="px-3 py-2 text-gray-500">
+                ...
+              </span>
+            ) : (
+              <Button
+                key={page}
+                onClick={() => handlePageChange(page as number)}
+                variant={page === validCurrentPage ? "default" : "outline"}
+                size="sm"
+                disabled={isLoading}
+                className={`h-10 min-w-[2.5rem] ${
+                  page === validCurrentPage
+                    ? "bg-blue-600 hover:bg-blue-700 text-white"
+                    : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+              >
+                {page}
+              </Button>
+            ),
+          )}
+        </div>
+
+        <Button
+          onClick={() => handlePageChange(validCurrentPage + 1)}
+          disabled={validCurrentPage === validTotalPages || isLoading}
+          variant="outline"
+          size="sm"
+          className="h-10 w-10 p-0"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </Button>
+      </div>
     </div>
   );
 }

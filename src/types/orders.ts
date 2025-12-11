@@ -54,8 +54,3 @@ export interface GetOrderDetailResponse {
   message: string;
   data: OrderDetail;
 }
-
-export interface DownloadPdfResponse {
-  url: string;
-  fileName: string;
-}
