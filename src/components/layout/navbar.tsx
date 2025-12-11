@@ -38,22 +38,22 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white dark:bg-background shadow-md fixed w-full z-10">
+    <nav className="bg-gray-900 dark:bg-gray-900 shadow-md fixed w-full z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
         {/* Logo */}
         <Link
           href="/"
-          className="font-bold text-2xl hover:text-blue-600 transition-colors"
+          className="font-bold text-2xl whitespace-nowrap text-white hover:text-gray-200 transition-colors mr-8 md:mr-12"
         >
           Tienda UCN
         </Link>
 
         {/* Menu desktop */}
-        <ul className="hidden md:flex space-x-8 font-medium items-center">
+        <ul className="hidden md:flex space-x-8 font-medium items-center text-white">
           <li>
             <Link
               href="/"
-              className="hover:text-blue-600 transition-colors cursor-pointer"
+              className="hover:text-gray-200 transition-colors cursor-pointer"
             >
               Inicio
             </Link>
@@ -61,7 +61,7 @@ export const Navbar = () => {
           <li>
             <Link
               href="/products"
-              className="hover:text-blue-600 transition-colors cursor-pointer"
+              className="hover:text-gray-200 transition-colors cursor-pointer"
             >
               Productos
             </Link>
@@ -69,7 +69,7 @@ export const Navbar = () => {
           <li>
             <Link
               href="/services"
-              className="hover:text-blue-600 transition-colors cursor-pointer"
+              className="hover:text-gray-200 transition-colors cursor-pointer"
             >
               Servicios
             </Link>
@@ -77,9 +77,19 @@ export const Navbar = () => {
           <li>
             <Link
               href="/contact"
-              className="hover:text-blue-600 transition-colors cursor-pointer"
+              className="hover:text-gray-200 transition-colors cursor-pointer"
             >
               Contacto
+            </Link>
+          </li>
+
+          {/* Mis Órdenes colocado junto al resto de enlaces */}
+          <li>
+            <Link
+              href="/orders"
+              className="hover:text-gray-200 transition-colors cursor-pointer"
+            >
+              Mis Órdenes
             </Link>
           </li>
 
@@ -91,7 +101,7 @@ export const Navbar = () => {
           ) : session?.user ? (
             <>
               {/* Mostrar nombre del usuario */}
-              <li className="text-sm text-gray-700 dark:text-gray-300">
+              <li className="text-sm text-gray-200">
                 Hola, {session.user.name?.split(" ")[0]}
               </li>
 
@@ -112,7 +122,7 @@ export const Navbar = () => {
                   onClick={handleLogout}
                   variant="ghost"
                   size="sm"
-                  className="ml-4 flex gap-2 items-center"
+                  className="ml-4 flex gap-2 items-center text-white hover:text-gray-200"
                 >
                   <LogOut size={18} /> Cerrar Sesión
                 </Button>
@@ -151,7 +161,7 @@ export const Navbar = () => {
         </ul>
 
         {/* Botón hamburguesa (mobile) */}
-        <button className="md:hidden" onClick={toggleMenu}>
+        <button className="md:hidden text-white" onClick={toggleMenu}>
           {menuOpen ? (
             <XIcon className="h-6 w-6" />
           ) : (
@@ -162,13 +172,13 @@ export const Navbar = () => {
 
       {/* Menu móvil */}
       {menuOpen && (
-        <div className="md:hidden flex flex-col items-center space-y-4 py-4 bg-white dark:bg-background shadow-md">
-          <ul className="text-center space-y-3 font-medium">
+        <div className="md:hidden flex flex-col items-center space-y-4 py-4 bg-gray-900 dark:bg-gray-900 shadow-md">
+          <ul className="text-center space-y-3 font-medium text-white">
             <li>
               <Link
                 href="/"
                 onClick={toggleMenu}
-                className="hover:text-blue-600 transition-colors cursor-pointer block py-2"
+                className="hover:text-gray-200 transition-colors cursor-pointer block py-2"
               >
                 Inicio
               </Link>
@@ -177,7 +187,7 @@ export const Navbar = () => {
               <Link
                 href="/products"
                 onClick={toggleMenu}
-                className="hover:text-blue-600 transition-colors cursor-pointer block py-2"
+                className="hover:text-gray-200 transition-colors cursor-pointer block py-2"
               >
                 Productos
               </Link>
@@ -186,7 +196,7 @@ export const Navbar = () => {
               <Link
                 href="/services"
                 onClick={toggleMenu}
-                className="hover:text-blue-600 transition-colors cursor-pointer block py-2"
+                className="hover:text-gray-200 transition-colors cursor-pointer block py-2"
               >
                 Servicios
               </Link>
@@ -198,6 +208,17 @@ export const Navbar = () => {
                 className="hover:text-blue-600 transition-colors cursor-pointer block py-2"
               >
                 Contacto
+              </Link>
+            </li>
+
+            {/* Mis Órdenes en móvil junto al resto */}
+            <li>
+              <Link
+                href="/orders"
+                onClick={toggleMenu}
+                className="hover:text-blue-600 transition-colors cursor-pointer block py-2"
+              >
+                Mis Órdenes
               </Link>
             </li>
 

@@ -116,7 +116,10 @@ export default function RegisterView() {
         >
           <div className="grid gap-6 md:grid-cols-2">
             <div>
-              <Label htmlFor="firstName" className="text-sm font-medium">
+              <Label
+                htmlFor="firstName"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Nombre *
               </Label>
               <Input
@@ -125,7 +128,7 @@ export default function RegisterView() {
                 disabled={isFormDisabled}
                 placeholder="Rodrigo"
                 aria-invalid={!!errors.firstName}
-                className="mt-1"
+                className="mt-1 dark:bg-black dark:text-white"
               />
               {errors.firstName && (
                 <p className="mt-1 text-sm text-red-600" role="alert">
@@ -135,7 +138,10 @@ export default function RegisterView() {
             </div>
 
             <div>
-              <Label htmlFor="lastName" className="text-sm font-medium">
+              <Label
+                htmlFor="lastName"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Apellido *
               </Label>
               <Input
@@ -144,7 +150,7 @@ export default function RegisterView() {
                 disabled={isFormDisabled}
                 placeholder="Tapia"
                 aria-invalid={!!errors.lastName}
-                className="mt-1"
+                className="mt-1 dark:bg-black dark:text-white"
               />
               {errors.lastName && (
                 <p className="mt-1 text-sm text-red-600" role="alert">
@@ -156,7 +162,10 @@ export default function RegisterView() {
 
           <div className="grid gap-6 md:grid-cols-2">
             <div>
-              <Label htmlFor="rut" className="text-sm font-medium">
+              <Label
+                htmlFor="rut"
+                className="block text-sm font-medium text-gray-700"
+              >
                 RUT *
               </Label>
               <Input
@@ -165,7 +174,7 @@ export default function RegisterView() {
                 disabled={isFormDisabled}
                 placeholder="21382034-6"
                 aria-invalid={!!errors.rut}
-                className="mt-1"
+                className="mt-1 dark:bg-black dark:text-white"
               />
               {errors.rut && (
                 <p className="mt-1 text-sm text-red-600" role="alert">
@@ -175,7 +184,10 @@ export default function RegisterView() {
             </div>
 
             <div>
-              <Label htmlFor="gender" className="text-sm font-medium">
+              <Label
+                htmlFor="gender"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Género *
               </Label>
               <Select
@@ -230,7 +242,10 @@ export default function RegisterView() {
 
           <div className="grid gap-6 md:grid-cols-2">
             <div>
-              <Label htmlFor="birthDate" className="text-sm font-medium">
+              <Label
+                htmlFor="birthDate"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Fecha de Nacimiento *
               </Label>
               <Input
@@ -240,7 +255,7 @@ export default function RegisterView() {
                 onInput={handleDateInput}
                 disabled={isFormDisabled}
                 aria-invalid={!!errors.birthDate}
-                className="mt-1"
+                className="mt-1 dark:bg-black dark:text-white"
                 placeholder="06-09-2003"
                 maxLength={10}
               />
@@ -253,7 +268,10 @@ export default function RegisterView() {
             </div>
 
             <div>
-              <Label htmlFor="phoneNumber" className="text-sm font-medium">
+              <Label
+                htmlFor="phoneNumber"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Teléfono *
               </Label>
               <Input
@@ -263,7 +281,7 @@ export default function RegisterView() {
                 disabled={isFormDisabled}
                 placeholder="996920954"
                 aria-invalid={!!errors.phoneNumber}
-                className="mt-1"
+                className="mt-1 dark:bg-black dark:text-white"
                 maxLength={9}
               />
               {errors.phoneNumber && (
@@ -275,7 +293,10 @@ export default function RegisterView() {
           </div>
 
           <div>
-            <Label htmlFor="email" className="text-sm font-medium">
+            <Label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               Correo Electrónico *
             </Label>
             <Input
@@ -285,7 +306,7 @@ export default function RegisterView() {
               disabled={isFormDisabled}
               placeholder="tu@email.com"
               aria-invalid={!!errors.email}
-              className="mt-1"
+              className="mt-1 dark:bg-black dark:text-white"
             />
             {errors.email && (
               <p className="mt-1 text-sm text-red-600" role="alert">
@@ -296,7 +317,10 @@ export default function RegisterView() {
 
           <div className="grid gap-6 md:grid-cols-2">
             <div>
-              <Label htmlFor="password" className="text-sm font-medium">
+              <Label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Contraseña *
               </Label>
               <div className="relative mt-1">
@@ -307,7 +331,7 @@ export default function RegisterView() {
                   disabled={isFormDisabled}
                   placeholder="••••••••"
                   aria-invalid={!!errors.password}
-                  className="pr-10"
+                  className="pr-10 dark:bg-black dark:text-white"
                 />
                 <button
                   type="button"
@@ -330,7 +354,10 @@ export default function RegisterView() {
             </div>
 
             <div>
-              <Label htmlFor="confirmPassword" className="text-sm font-medium">
+              <Label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Confirmar Contraseña *
               </Label>
               <div className="relative mt-1">
@@ -341,7 +368,7 @@ export default function RegisterView() {
                   disabled={isFormDisabled}
                   placeholder="••••••••"
                   aria-invalid={!!errors.confirmPassword}
-                  className="pr-10"
+                  className="pr-10 dark:bg-black dark:text-white"
                 />
                 <button
                   type="button"

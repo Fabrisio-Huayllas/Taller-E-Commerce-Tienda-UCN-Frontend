@@ -167,7 +167,7 @@ export default function LoginView() {
                   error={errors.email?.message}
                   {...register("email")}
                   aria-label="Correo electrónico"
-                  className="w-full"
+                  className="w-full dark:bg-black dark:text-white"
                 />
                 {errors.email && (
                   <p
@@ -198,9 +198,9 @@ export default function LoginView() {
                   placeholder="••••••••"
                   disabled={isFormDisabled}
                   error={errors.password?.message}
+                  className="w-full pr-10 dark:bg-black dark:text-white"
                   {...register("password")}
                   aria-label="Contraseña"
-                  className="w-full pr-10"
                 />
                 <button
                   type="button"
