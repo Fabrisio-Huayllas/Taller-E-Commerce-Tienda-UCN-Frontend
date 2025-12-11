@@ -28,7 +28,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
           </svg>
         </div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          No hay ordenes
+          No hay órdenes
         </h3>
         <p className="text-gray-500 dark:text-gray-400">
           Aun no has realizado ninguna compra
@@ -43,7 +43,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
         <thead className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
           <tr>
             <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
-              Codigo
+              Código
             </th>
             <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
               Fecha
@@ -92,7 +92,11 @@ export function OrdersTable({ orders }: OrdersTableProps) {
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                  ${order.total.toLocaleString()}
+                  $
+                  {(() => {
+                    const n = Number(order.total);
+                    return isNaN(n) ? "—" : n.toLocaleString("es-CL");
+                  })()}
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
@@ -125,7 +129,7 @@ export function OrdersTableSkeleton({ rows = 5 }: OrdersTableSkeletonProps) {
         <thead className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
           <tr>
             <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
-              Codigo
+              Código
             </th>
             <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
               Fecha

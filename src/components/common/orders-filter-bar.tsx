@@ -61,7 +61,7 @@ export function OrdersFilterBar({
       <div className="flex gap-2 flex-1 max-w-md">
         <div className="relative flex-1">
           <Input
-            placeholder="Buscar por codigo de orden..."
+            placeholder="Buscar por código de orden..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyPress={handleKeyPress}

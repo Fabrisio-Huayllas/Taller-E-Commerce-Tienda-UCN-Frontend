@@ -39,7 +39,7 @@ export function OrderDetailView({
             className="mb-4 hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver a mis ordenes
+            Volver a mis órdenes
           </Button>
         </div>
 
@@ -126,7 +126,11 @@ export function OrderDetailView({
                   Total pagado
                 </p>
                 <p className="text-3xl font-bold text-green-600 dark:text-green-400">
-                  ${order.total?.toLocaleString() || "—"}
+                  $
+                  {(() => {
+                    const n = Number(order.total);
+                    return isNaN(n) ? "—" : n.toLocaleString("es-CL");
+                  })()}
                 </p>
               </div>
               <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
@@ -265,7 +269,12 @@ export function OrderDetailView({
             <div className="space-y-3">
               <div className="flex justify-between text-gray-600 dark:text-gray-400">
                 <span>Subtotal:</span>
-                <span>${order.total?.toLocaleString() || "—"}</span>
+                <span>
+                  {(() => {
+                    const n = Number(order.total);
+                    return isNaN(n) ? "—" : n.toLocaleString("es-CL");
+                  })()}
+                </span>
               </div>
               <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
                 <div className="flex justify-between items-center">
@@ -273,7 +282,11 @@ export function OrderDetailView({
                     Total:
                   </span>
                   <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                    ${order.total?.toLocaleString() || "—"}
+                    $
+                    {(() => {
+                      const n = Number(order.total);
+                      return isNaN(n) ? "—" : n.toLocaleString("es-CL");
+                    })()}
                   </span>
                 </div>
               </div>
@@ -298,7 +311,7 @@ export function OrderDetailSkeleton({ onGoBack }: OrderDetailSkeletonProps) {
         <div className="mb-6">
           <Button onClick={onGoBack} variant="ghost" className="mb-4" disabled>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver a mis ordenes
+            Volver a mis órdenes
           </Button>
         </div>
 

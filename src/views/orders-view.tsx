@@ -43,7 +43,7 @@ export function OrdersView() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            Mis Ordenes
+            Mis Órdenes
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Historial completo de tus compras

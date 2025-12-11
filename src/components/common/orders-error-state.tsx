@@ -20,7 +20,7 @@ export function OrdersErrorState({
         <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
       </div>
       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-        Error al cargar ordenes
+        Error al cargar órdenes
       </h3>
       <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
         {error}

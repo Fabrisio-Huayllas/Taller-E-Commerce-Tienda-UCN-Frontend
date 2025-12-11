@@ -30,10 +30,10 @@ export const Navbar = () => {
   const handleLogout = async () => {
     try {
       await signOut({ callbackUrl: "/" });
-      toast.success("Sesion cerrada exitosamente");
+      toast.success("Sesión cerrada exitosamente");
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_error) {
-      toast.error("Error al cerrar sesion");
+      toast.error("Error al cerrar sesión");
     }
   };
 
@@ -89,7 +89,7 @@ export const Navbar = () => {
                 href="/orders"
                 className="hover:text-gray-200 transition-colors cursor-pointer"
               >
-                Mis Ordenes
+                Mis Órdenes
               </Link>
             </li>
           )}
@@ -124,7 +124,7 @@ export const Navbar = () => {
                   size="sm"
                   className="ml-4 flex gap-2 items-center text-white hover:text-gray-200"
                 >
-                  <LogOut size={18} /> Cerrar Sesion
+                  <LogOut size={18} /> Cerrar Sesión
                 </Button>
               </li>
             </>
@@ -132,7 +132,7 @@ export const Navbar = () => {
             <li>
               <Link href="/auth/login">
                 <Button className="ml-4 flex gap-2 items-center">
-                  <UserIcon size={18} /> Iniciar Sesion
+                  <UserIcon size={18} /> Iniciar Sesión
                 </Button>
               </Link>
             </li>
@@ -211,7 +211,7 @@ export const Navbar = () => {
               </Link>
             </li>
 
-            {/* Mis Ordenes en movil junto al resto - solo si esta logueado */}
+            {/* Mis Órdenes en móvil junto al resto - solo si está logueado */}
             {session?.user && (
               <li>
                 <Link
@@ -219,7 +219,7 @@ export const Navbar = () => {
                   onClick={toggleMenu}
                   className="hover:text-blue-600 transition-colors cursor-pointer block py-2"
                 >
-                  Mis Ordenes
+                  Mis Órdenes
                 </Link>
               </li>
             )}
@@ -254,7 +254,7 @@ export const Navbar = () => {
                     className="w-full flex gap-2 items-center"
                     variant="ghost"
                   >
-                    <LogOut size={18} /> Cerrar Sesion
+                    <LogOut size={18} /> Cerrar Sesión
                   </Button>
                 </li>
               </>
@@ -262,7 +262,7 @@ export const Navbar = () => {
               <li className="w-full px-6">
                 <Link href="/auth/login" onClick={toggleMenu}>
                   <Button className="w-full flex gap-2 items-center rounded-full">
-                    <UserIcon size={18} /> Iniciar Sesion
+                    <UserIcon size={18} /> Iniciar Sesión
                   </Button>
                 </Link>
               </li>

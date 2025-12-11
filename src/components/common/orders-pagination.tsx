@@ -71,7 +71,7 @@ export function OrdersPagination({
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
       <div className="text-sm text-gray-600 dark:text-gray-400">
-        Pagina{" "}
+        Página{" "}
         <span className="font-semibold text-gray-900 dark:text-white">
           {validCurrentPage}
         </span>{" "}
