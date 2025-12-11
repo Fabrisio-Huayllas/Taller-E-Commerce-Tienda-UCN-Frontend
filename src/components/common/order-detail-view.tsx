@@ -216,9 +216,9 @@ export function OrderDetailView({
                           {price}
                         </td>
                         <td className="px-6 py-4">
-                          <span className="inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                          <div className="flex justify-center">
                             {item.quantity || "—"}
-                          </span>
+                          </div>
                         </td>
                         <td className="px-6 py-4 text-right">
                           <span className="text-sm font-semibold text-gray-900 dark:text-white">
