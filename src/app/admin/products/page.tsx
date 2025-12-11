@@ -1,16 +1,91 @@
 "use client";
 
+import { useState, useMemo, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { Loader2 } from "lucide-react";
-import { redirect } from "next/navigation";
+import { useAdminProducts } from "@/hooks/useAdminProducts";
+import { ProductsTable } from "@/components/admin/products-table";
+import { ProductsFilter } from "@/components/admin/products-filter";
+import { Button } from "@/components/ui/button";
+import { Loader2, Plus } from "lucide-react";
+import { redirect, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import {
+  toggleProductStatus,
+  deleteProduct,
+} from "@/services/adminProductService";
+import { toast } from "sonner";
 
-/**
- * Placeholder para el panel de administración
- */
 export default function AdminProductsPage() {
-  const { isAdmin, isLoading } = useAuth();
+  const { isAdmin, isLoading: authLoading } = useAuth();
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [searchInput, setSearchInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [pageNumber, setPageNumber] = useState(1);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const pageSize = 10;
 
-  if (isLoading) {
+  const filters = useMemo(
+    () => ({
+      pageNumber,
+      pageSize,
+      searchTerm: searchTerm || undefined,
+    }),
+    [pageNumber, pageSize, searchTerm],
+  );
+
+  const { products, totalCount, totalPages, currentPage, loading, error } =
+    useAdminProducts(filters, refreshKey);
+
+  const handleSearch = useCallback(() => {
+    setSearchTerm(searchInput);
+    setPageNumber(1);
+  }, [searchInput]);
+
+  const handleEdit = useCallback(
+    (productId: number) => {
+      router.push(`/admin/products/edit/${productId}`);
+    },
+    [router],
+  );
+
+  const handleToggleStatus = useCallback(
+    async (productId: number) => {
+      if (!session?.accessToken) return;
+
+      try {
+        await toggleProductStatus(productId, session.accessToken);
+        toast.success("Estado del producto actualizado");
+        setRefreshKey((prev) => prev + 1);
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Error al actualizar estado",
+        );
+      }
+    },
+    [session],
+  );
+
+  const handleDelete = useCallback(
+    async (productId: number) => {
+      if (!session?.accessToken) return;
+
+      if (!confirm("¿Estás seguro de eliminar este producto?")) return;
+
+      try {
+        await deleteProduct(productId, session.accessToken);
+        toast.success("Producto eliminado correctamente");
+        setRefreshKey((prev) => prev + 1);
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Error al eliminar producto",
+        );
+      }
+    },
+    [session],
+  );
+
+  if (authLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -24,16 +99,68 @@ export default function AdminProductsPage() {
 
   return (
     <div className="container mx-auto px-4 py-24">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Panel de Administración</h1>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Gestión de Productos</h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            Esta página está en construcción. Aquí podrás gestionar los
-            productos de la tienda.
-          </p>
-        </div>
+      <div className="mb-6 flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Gestión de Productos</h1>
+        <Button onClick={() => router.push("/admin/products/new")}>
+          <Plus className="h-4 w-4 mr-2" />
+          Nuevo Producto
+        </Button>
       </div>
+
+      <ProductsFilter
+        searchTerm={searchInput}
+        onSearchChange={setSearchInput}
+        onSearch={handleSearch}
+      />
+
+      {loading ? (
+        <div className="flex justify-center items-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      ) : error ? (
+        <div className="text-center text-red-500 py-8">Error: {error}</div>
+      ) : products.length === 0 ? (
+        <div className="text-center text-gray-500 py-8">
+          No se encontraron productos
+        </div>
+      ) : (
+        <>
+          <ProductsTable
+            products={products}
+            onEdit={handleEdit}
+            onToggleStatus={handleToggleStatus}
+            onDelete={handleDelete}
+          />
+
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-6">
+              <Button
+                onClick={() => setPageNumber((prev) => Math.max(1, prev - 1))}
+                disabled={currentPage === 1 || loading}
+                variant="outline"
+              >
+                Anterior
+              </Button>
+              <span className="px-4 py-2">
+                Página {currentPage} de {totalPages}
+              </span>
+              <Button
+                onClick={() =>
+                  setPageNumber((prev) => Math.min(totalPages, prev + 1))
+                }
+                disabled={currentPage === totalPages || loading}
+                variant="outline"
+              >
+                Siguiente
+              </Button>
+            </div>
+          )}
+
+          <p className="text-center text-gray-600 mt-4">
+            Total: {totalCount} productos
+          </p>
+        </>
+      )}
     </div>
   );
 }
