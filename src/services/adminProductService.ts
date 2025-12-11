@@ -32,7 +32,7 @@ interface BackendProduct {
   finalPrice: string;
 }
 
-export interface AdminProductsResponse {
+interface AdminProductsResponse {
   message: string;
   data: {
     products: BackendProduct[];
@@ -89,9 +89,8 @@ export async function getAdminProducts(
     throw new Error("Error al obtener productos");
   }
 
-  const result = await response.json();
+  const result: AdminProductsResponse = await response.json();
 
-  // Mapear productos asegurando que tengan el campo id
   const mappedProducts = result.data.products.map(
     (product: BackendProduct) => ({
       ...product,
