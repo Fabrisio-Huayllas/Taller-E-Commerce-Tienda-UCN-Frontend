@@ -9,8 +9,7 @@ import {
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5043/api";
 
-/** @internal */
-export class OrderServiceError extends Error {
+class OrderServiceError extends Error {
   constructor(
     public statusCode: number,
     message: string,

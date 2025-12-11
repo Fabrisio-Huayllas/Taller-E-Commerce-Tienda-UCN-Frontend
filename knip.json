@@ -9,6 +9,5 @@
   "ignoreBinaries": [],
   "entry": ["src/app/**/*.{ts,tsx}", "!src/app/**/*.test.{ts,tsx}"],
   "project": ["src/**/*.{ts,tsx}"],
-  "ignore": ["src/components/ui/**", "src/components/index.ts", "src/auth.ts"],
-  "ignoreExports": ["OrderServiceError", "DownloadPdfResponse"]
+  "ignore": ["src/components/ui/**", "src/components/index.ts", "src/auth.ts"]
 }
