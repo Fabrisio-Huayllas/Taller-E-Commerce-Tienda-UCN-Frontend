@@ -51,6 +51,7 @@ export interface AdminProductFilters {
   brandId?: number;
   minPrice?: number;
   maxPrice?: number;
+  isAvailable?: boolean;
 }
 
 export async function getAdminProducts(
@@ -74,16 +75,20 @@ export async function getAdminProducts(
   if (filters?.brandId) params.append("BrandId", filters.brandId.toString());
   if (filters?.minPrice) params.append("MinPrice", filters.minPrice.toString());
   if (filters?.maxPrice) params.append("MaxPrice", filters.maxPrice.toString());
+  if (filters?.isAvailable !== undefined)
+    params.append("IsAvailable", filters.isAvailable.toString());
 
-  const response = await fetch(
-    `${API_BASE_URL}/product/admin/products?${params}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+  const url = `${API_BASE_URL}/product/admin/products?${params}`;
+  // Eliminar estos console.log
+  // console.log('🌐 URL generada:', url);
+  // console.log('📦 Filtros:', filters);
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
-  );
+  });
 
   if (!response.ok) {
     throw new Error("Error al obtener productos");

@@ -23,9 +23,13 @@ export function useAdminProducts(filters: AdminProductFilters, refreshKey = 0) {
         return;
       }
 
+      // Eliminar estos console.log
+      // console.log('🔍 Filtros recibidos en hook:', filters);
+
       try {
         setLoading(true);
         const data = await getAdminProducts(session.accessToken, filters);
+        // console.log('✅ Productos recibidos:', data.products.length);
         setProducts(data.products);
         setTotalCount(data.totalCount);
         setTotalPages(data.totalPages);
