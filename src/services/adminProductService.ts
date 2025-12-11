@@ -54,6 +54,44 @@ export interface AdminProductFilters {
   isAvailable?: boolean;
 }
 
+// ============= NUEVAS INTERFACES PARA FORMULARIOS =============
+
+export interface ProductFormData {
+  title: string;
+  description: string;
+  price: number;
+  discount: number;
+  stock: number;
+  status: "New" | "Used";
+  categoryId: number;
+  brandId: number;
+  images?: FileList;
+}
+
+export interface ProductDetail {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  discount: number;
+  stock: number;
+  status: string;
+  categoryId: number;
+  categoryName: string;
+  brandId: number;
+  brandName: string;
+  images: Array<{
+    id: number;
+    imageUrl: string;
+    publicId: string;
+  }>;
+  isAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ============= FUNCIONES EXISTENTES =============
+
 export async function getAdminProducts(
   token: string,
   filters?: AdminProductFilters,
@@ -79,9 +117,6 @@ export async function getAdminProducts(
     params.append("IsAvailable", filters.isAvailable.toString());
 
   const url = `${API_BASE_URL}/product/admin/products?${params}`;
-  // Eliminar estos console.log
-  // console.log('🌐 URL generada:', url);
-  // console.log('📦 Filtros:', filters);
 
   const response = await fetch(url, {
     headers: {
@@ -148,5 +183,138 @@ export async function deleteProduct(
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || "Error al eliminar producto");
+  }
+}
+
+// ============= NUEVAS FUNCIONES PARA CREAR/EDITAR =============
+
+export async function getProductById(
+  productId: number,
+  token: string,
+): Promise<ProductDetail> {
+  const response = await fetch(`${API_BASE_URL}/product/admin/${productId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Error al obtener el producto");
+  }
+
+  const result = await response.json();
+  return result.data;
+}
+
+export async function createProduct(
+  data: ProductFormData,
+  token: string,
+): Promise<string> {
+  const formData = new FormData();
+
+  formData.append("Title", data.title);
+  formData.append("Description", data.description);
+  formData.append("Price", data.price.toString());
+  formData.append("Discount", data.discount.toString());
+  formData.append("Stock", data.stock.toString());
+  formData.append("Status", data.status);
+  formData.append("CategoryId", data.categoryId.toString());
+  formData.append("BrandId", data.brandId.toString());
+
+  if (data.images) {
+    Array.from(data.images).forEach((file) => {
+      formData.append("Images", file);
+    });
+  }
+
+  const response = await fetch(`${API_BASE_URL}/product`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Error al crear el producto");
+  }
+
+  const result = await response.json();
+  return result.data;
+}
+
+export async function updateProduct(
+  productId: number,
+  data: Omit<ProductFormData, "images">,
+  token: string,
+): Promise<void> {
+  const response = await fetch(
+    `${API_BASE_URL}/product/admin/products/${productId}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: data.title,
+        description: data.description,
+        price: data.price,
+        stock: data.stock,
+        categoryId: data.categoryId,
+        brandId: data.brandId,
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Error al actualizar el producto");
+  }
+}
+
+export async function uploadProductImages(
+  productId: number,
+  files: FileList,
+  token: string,
+): Promise<void> {
+  const formData = new FormData();
+
+  Array.from(files).forEach((file) => {
+    formData.append("files", file);
+  });
+
+  const response = await fetch(`${API_BASE_URL}/product/${productId}/images`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error("Error al subir las imágenes");
+  }
+}
+
+export async function deleteProductImage(
+  productId: number,
+  imageId: number,
+  token: string,
+): Promise<void> {
+  const response = await fetch(
+    `${API_BASE_URL}/product/${productId}/images/${imageId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Error al eliminar la imagen");
   }
 }
