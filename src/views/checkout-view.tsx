@@ -221,13 +221,10 @@ export default function CheckoutView() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => {
-                  // TODO: Implementar navegación a página de órdenes
-                  console.log("Navegar a mis órdenes");
-                }}
+                onClick={() => router.push("/orders")}
                 className="cursor-pointer"
               >
-                Ver mis órdenes
+                Ver mis ordenes
               </Button>
             </div>
           </div>
