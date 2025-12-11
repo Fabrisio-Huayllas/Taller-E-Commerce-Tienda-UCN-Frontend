@@ -15,7 +15,8 @@ export interface OrderItem {
 export interface Order {
   id: number;
   code: string;
-  date: string;
+  date?: string; // fallback
+  purchasedAt?: string; // del backend
   status: string;
   statusName: string;
   itemsCount: number;

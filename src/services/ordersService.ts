@@ -3,6 +3,7 @@ import {
   GetOrdersResponse,
   GetOrderDetailResponse,
   OrderDetail,
+  Order,
 } from "@/types/orders";
 
 const API_BASE_URL =
@@ -58,7 +59,17 @@ export const ordersService = {
     });
 
     const result = await handleResponse<GetOrdersResponse>(response);
-    return result.data;
+
+    // Mapear purchasedAt a date si no existe
+    const ordersWithDate = result.data.orders.map((order: Order) => ({
+      ...order,
+      date: order.date || order.purchasedAt,
+    }));
+
+    return {
+      ...result.data,
+      orders: ordersWithDate,
+    };
   },
 
   async getOrderDetail(token: string, orderCode: string): Promise<OrderDetail> {

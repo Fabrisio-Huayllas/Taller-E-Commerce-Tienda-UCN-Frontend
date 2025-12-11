@@ -67,15 +67,7 @@ export function OrderDetailView({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
-          <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
-            Estado
-          </p>
-          <p className="text-lg font-semibold text-gray-900 dark:text-white">
-            {order.statusName || order.status || "—"}
-          </p>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
           <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
             Cantidad de productos
