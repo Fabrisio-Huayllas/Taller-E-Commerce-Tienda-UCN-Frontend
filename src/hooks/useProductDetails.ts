@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getProductById } from "@/services/productService";
 
-export function useGetProductDetail(productId: number) {
+function useGetProductDetail(productId: number) {
   return useQuery({
     queryKey: ["product", productId],
     queryFn: () => getProductById(productId),

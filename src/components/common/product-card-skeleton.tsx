@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function ProductCardSkeleton() {
+function ProductCardSkeleton() {
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden">
       <Skeleton className="w-full h-64" />

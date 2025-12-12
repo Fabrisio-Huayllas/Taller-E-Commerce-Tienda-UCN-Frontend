@@ -13,10 +13,7 @@ export { ProductCard } from "@/components/common/product-card";
 export { CartDrawer } from "@/components/common/cart-drawer";
 
 // Products Components
-export {
-  ProductCardSkeleton,
-  ProductsGridSkeleton,
-} from "@/components/common/product-card-skeleton";
+export { ProductsGridSkeleton } from "@/components/common/product-card-skeleton";
 export { ProductsEmptyState } from "@/components/common/products-empty-state";
 export { ProductsErrorState } from "@/components/common/products-error-state";
 export { ProductsPagination } from "@/components/common/products-pagination";

@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getProducts, ProductFilters } from "@/services/productService";
 
-export function useGetProductsForCustomer(filters?: ProductFilters) {
+function useGetProductsForCustomer(filters?: ProductFilters) {
   return useQuery({
     queryKey: ["products", filters],
     queryFn: () => getProducts(filters),
