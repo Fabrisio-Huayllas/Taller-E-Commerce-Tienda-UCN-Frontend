@@ -172,13 +172,19 @@ export default function CartView() {
     router.push("/checkout");
   };
 
+  // Calcula el precio unitario con descuento aplicado (para mostrar)
+  const calculatePriceWithDiscount = (price: number, discount?: number) => {
+    return discount ? price * (1 - discount / 100) : price;
+  };
+
+  // Calcula el total del item: precio con descuento × cantidad
   const calculateItemTotal = (
     price: number,
     quantity: number,
     discount?: number,
   ) => {
-    const finalPrice = discount ? price * (1 - discount / 100) : price;
-    return finalPrice * quantity;
+    const priceWithDiscount = calculatePriceWithDiscount(price, discount);
+    return priceWithDiscount * quantity;
   };
 
   if (isLoading) {
@@ -263,9 +269,10 @@ export default function CartView() {
           {/* Lista de productos */}
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => {
-              const finalPrice = item.discount
-                ? item.price * (1 - item.discount / 100)
-                : item.price;
+              const finalPrice = calculatePriceWithDiscount(
+                item.price,
+                item.discount,
+              );
               const itemTotal = calculateItemTotal(
                 item.price,
                 item.quantity,
