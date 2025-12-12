@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { useProductDetail } from "@/hooks/useProductDetail";
+import { useProductDetail } from "@/hooks/useProductDetails";
 import { useCartStore } from "@/stores/cartStore";
 import { Toast } from "@/components/ui/toast";
+import { ProductImageCarousel } from "@/components/common/product-image-carousel";
+import { ProductDetailsTable } from "@/components/common/product-details-table";
+import { ProductLoadingState } from "@/components/common/product-loading-state";
+import { ProductErrorState } from "@/components/common/product-error-state";
+import { ProductDetailEmptyState } from "@/components/common/product-detail-empty-state";
 
 interface ProductDetailViewProps {
   productId: number;
@@ -14,9 +18,7 @@ interface ProductDetailViewProps {
 export default function ProductDetailView({
   productId,
 }: ProductDetailViewProps) {
-  const { product, loading, error } = useProductDetail(productId);
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [imageError, setImageError] = useState(false);
+  const { product, loading, error, refetch } = useProductDetail(productId);
   const [quantity, setQuantity] = useState(1);
   const [toast, setToast] = useState<{
     message: string;
@@ -65,24 +67,15 @@ export default function ProductDetailView({
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <ProductLoadingState />;
   }
 
-  if (error || !product) {
-    return (
-      <div className="flex flex-col justify-center items-center min-h-screen gap-4">
-        <p className="text-red-500 text-lg">
-          {error || "Producto no encontrado"}
-        </p>
-        <Link href="/products" className="text-blue-600 hover:underline">
-          Volver a productos
-        </Link>
-      </div>
-    );
+  if (error) {
+    return <ProductErrorState error={error} onRetry={() => refetch()} />;
+  }
+
+  if (!product) {
+    return <ProductDetailEmptyState />;
   }
 
   return (
@@ -109,72 +102,11 @@ export default function ProductDetailView({
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Galería de imágenes */}
-          <div className="space-y-4">
-            {/* Imagen principal - FIX: usar min-h en lugar de aspect-square */}
-            <div className="relative w-full min-h-[500px] lg:min-h-[600px] bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
-              {!imageError && product.imagesURL[selectedImage] ? (
-                <Image
-                  src={product.imagesURL[selectedImage]}
-                  alt={product.title}
-                  width={450}
-                  height={450}
-                  sizes="(max-width: 768px) 100vw, 600px"
-                  className="object-contain max-w-full max-h-full"
-                  priority
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  <svg
-                    className="w-32 h-32"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              )}
-
-              {/* Badge de descuento */}
-              {product.discount > 0 && (
-                <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded text-sm font-bold">
-                  -{product.discount}%
-                </div>
-              )}
-            </div>
-
-            {/* Miniaturas */}
-            {product.imagesURL.length > 1 && (
-              <div className="grid grid-cols-5 gap-2">
-                {product.imagesURL.map((url, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setSelectedImage(index);
-                      setImageError(false);
-                    }}
-                    className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                      selectedImage === index
-                        ? "border-blue-600"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <Image
-                      src={url}
-                      alt={`Vista ${index + 1}`}
-                      fill
-                      sizes="100px"
-                      className="object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <ProductImageCarousel
+            images={product.imagesURL}
+            title={product.title}
+            discount={product.discount}
+          />
 
           {/* Información del producto */}
           <div className="space-y-6">
@@ -317,37 +249,12 @@ export default function ProductDetailView({
             </div>
 
             {/* Especificaciones */}
-            <div className="border-t border-gray-200 pt-6 space-y-3">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Especificaciones
-              </h2>
-              <dl className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <dt className="text-gray-500">Marca</dt>
-                  <dd className="font-medium text-gray-900">
-                    {product.brandName}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-gray-500">Estado</dt>
-                  <dd className="font-medium text-gray-900">
-                    {product.statusName}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-gray-500">Categoría</dt>
-                  <dd className="font-medium text-gray-900">
-                    {product.categoryName}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-gray-500">Stock</dt>
-                  <dd className="font-medium text-gray-900">
-                    {product.stock} unidades
-                  </dd>
-                </div>
-              </dl>
-            </div>
+            <ProductDetailsTable
+              brandName={product.brandName}
+              statusName={product.statusName}
+              categoryName={product.categoryName}
+              stock={product.stock}
+            />
           </div>
         </div>
       </div>

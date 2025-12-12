@@ -4,6 +4,7 @@ import "./globals.css";
 import { Footer, Navbar } from "@/components";
 import { CartCleanupProvider } from "@/components/providers/cart-cleanup-provider";
 import { AuthProvider } from "@/components/providers/auth-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -31,14 +32,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
-        <AuthProvider>
-          <CartCleanupProvider>
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <Toaster position="top-right" richColors closeButton />
-          </CartCleanupProvider>
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <CartCleanupProvider>
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <Toaster position="top-right" richColors closeButton />
+            </CartCleanupProvider>
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
