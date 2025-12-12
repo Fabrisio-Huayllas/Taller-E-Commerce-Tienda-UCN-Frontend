@@ -259,10 +259,12 @@ export async function updateProduct(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        name: data.title,
+        name: data.title, // ✅ Cambiado: title → name
         description: data.description,
         price: data.price,
+        discount: data.discount,
         stock: data.stock,
+        status: data.status,
         categoryId: data.categoryId,
         brandId: data.brandId,
       }),
