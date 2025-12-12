@@ -27,11 +27,8 @@ export default function ProductDetailView({
   const handleAddToCart = () => {
     if (product) {
       // Calcular el precio numérico desde el precio base y descuento
+      // Extraer el precio base (precio original sin descuento)
       const basePrice = parseFloat(product.price.replace(/[^0-9]+/g, ""));
-      const finalPrice =
-        product.discount > 0
-          ? basePrice * (1 - product.discount / 100)
-          : basePrice;
 
       let successCount = 0;
       let lastError = null;
@@ -41,10 +38,10 @@ export default function ProductDetailView({
           id: product.id,
           name: product.title,
           description: product.description,
-          price: finalPrice,
+          price: basePrice, // ✅ Guardar el precio ORIGINAL, no el precio con descuento
           imageUrl: product.imagesURL[0] || "",
           stock: product.stock,
-          discount: product.discount,
+          discount: product.discount, // El descuento se aplicará en el cart/checkout
         });
 
         if (result.success) {

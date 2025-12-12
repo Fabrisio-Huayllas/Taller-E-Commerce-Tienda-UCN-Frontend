@@ -178,7 +178,7 @@ export function ProductForm({
           <select
             {...register("status")}
             disabled={isLoading}
-            className="w-full px-3 py-2 border rounded-md"
+            className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
           >
             <option value="New">Nuevo</option>
             <option value="Used">Usado</option>
@@ -196,7 +196,7 @@ export function ProductForm({
           <select
             {...register("categoryId", { valueAsNumber: true })}
             disabled={isLoading}
-            className="w-full px-3 py-2 border rounded-md"
+            className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
           >
             <option value="">Selecciona una categoría</option>
             {categories.map((category) => (
@@ -220,7 +220,7 @@ export function ProductForm({
           <select
             {...register("brandId", { valueAsNumber: true })}
             disabled={isLoading}
-            className="w-full px-3 py-2 border rounded-md"
+            className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
           >
             <option value="">Selecciona una marca</option>
             {brands.map((brand) => (

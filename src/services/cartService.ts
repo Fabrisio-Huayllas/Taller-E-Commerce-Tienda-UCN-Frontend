@@ -25,13 +25,14 @@ export interface CartResponse {
     items: Array<{
       id: number;
       productId: number;
-      productName: string;
-      productDescription: string;
-      productPrice: number;
+      productTitle: string; // Backend envía ProductTitle
       productImageUrl: string;
+      price: number; // Backend envía Price (precio original)
       quantity: number;
+      discount: number; // Backend envía Discount (porcentaje)
       stock: number;
-      discount?: number;
+      subTotalPrice: string; // Precio sin descuento formateado
+      totalPrice: string; // Precio con descuento formateado
     }>;
     totalItems: number;
     totalPrice: number;
@@ -466,12 +467,12 @@ export async function checkoutCart(
 export function mapCartResponseToItems(response: CartResponse): CartItem[] {
   return response.data.items.map((item) => ({
     id: item.productId,
-    name: item.productName,
-    description: item.productDescription,
-    price: item.productPrice,
+    name: item.productTitle, // Corregido: usar productTitle del backend
+    description: "", // El backend no envía description en CartItemDTO
+    price: item.price, // Corregido: usar price (precio original sin descuento)
     imageUrl: item.productImageUrl,
     quantity: item.quantity,
     stock: item.stock,
-    discount: item.discount,
+    discount: item.discount, // Porcentaje de descuento
   }));
 }
