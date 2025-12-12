@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface FilterBarProps {
   onSearchChange: (search: string) => void;
@@ -14,15 +14,28 @@ export function FilterBar({
   isLoading = false,
 }: FilterBarProps) {
   const [searchInput, setSearchInput] = useState(initialSearch);
+  const isFirstRender = useRef(true);
+
+  // Sincronizar con initialSearch cuando cambie desde la URL
+  useEffect(() => {
+    setSearchInput(initialSearch);
+  }, [initialSearch]);
 
   // Debounce: espera 500ms después de que el usuario deje de escribir
   useEffect(() => {
+    // No ejecutar en el primer render para evitar llamadas innecesarias
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     const timer = setTimeout(() => {
       onSearchChange(searchInput);
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchInput, onSearchChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput]); // Solo depende de searchInput, no de onSearchChange
 
   return (
     <div className="mb-8 max-w-2xl mx-auto">
