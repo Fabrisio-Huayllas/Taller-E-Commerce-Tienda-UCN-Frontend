@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Product } from "@/services/productService";
-import { useState } from "react";
+import { useState, memo } from "react";
 import { useCartStore } from "@/stores/cartStore";
 import { Toast } from "@/components/ui/toast";
 
@@ -11,7 +11,7 @@ interface ProductCardProps {
   onClick?: () => void;
 }
 
-export const ProductCard = ({ product, onClick }: ProductCardProps) => {
+const ProductCardComponent = ({ product, onClick }: ProductCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
@@ -152,3 +152,14 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
     </>
   );
 };
+
+export const ProductCard = memo(
+  ProductCardComponent,
+  (prevProps, nextProps) => {
+    return (
+      prevProps.product.id === nextProps.product.id &&
+      prevProps.product.stock === nextProps.product.stock &&
+      prevProps.product.isAvailable === nextProps.product.isAvailable
+    );
+  },
+);

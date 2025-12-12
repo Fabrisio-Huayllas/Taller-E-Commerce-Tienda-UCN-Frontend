@@ -1,3 +1,7 @@
+"use client";
+
+import { memo } from "react";
+
 interface ProductsPaginationProps {
   currentPage: number;
   totalPages: number;
@@ -5,12 +9,12 @@ interface ProductsPaginationProps {
   isLoading?: boolean;
 }
 
-export function ProductsPagination({
+const ProductsPaginationComponent = ({
   currentPage,
   totalPages,
   onPageChange,
   isLoading = false,
-}: ProductsPaginationProps) {
+}: ProductsPaginationProps) => {
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     const showPages = 5;
@@ -92,4 +96,15 @@ export function ProductsPagination({
       </button>
     </nav>
   );
-}
+};
+
+export const ProductsPagination = memo(
+  ProductsPaginationComponent,
+  (prevProps, nextProps) => {
+    return (
+      prevProps.currentPage === nextProps.currentPage &&
+      prevProps.totalPages === nextProps.totalPages &&
+      prevProps.isLoading === nextProps.isLoading
+    );
+  },
+);

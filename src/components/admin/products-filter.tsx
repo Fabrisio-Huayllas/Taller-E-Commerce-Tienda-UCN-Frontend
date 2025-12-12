@@ -60,7 +60,7 @@ export function ProductsFilter({
                 e.target.value ? Number(e.target.value) : undefined,
               )
             }
-            className="w-full px-3 py-2 border rounded-md"
+            className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [&>option]:bg-white [&>option]:text-gray-900 [&>option:checked]:bg-blue-600 [&>option:checked]:text-white dark:[&>option]:bg-gray-800 dark:[&>option]:text-gray-100"
           >
             <option value="">Todas las categorías</option>
             {categories.map((category) => (
@@ -79,7 +79,7 @@ export function ProductsFilter({
             onChange={(e) =>
               onBrandChange(e.target.value ? Number(e.target.value) : undefined)
             }
-            className="w-full px-3 py-2 border rounded-md"
+            className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [&>option]:bg-white [&>option]:text-gray-900 [&>option:checked]:bg-blue-600 [&>option:checked]:text-white dark:[&>option]:bg-gray-800 dark:[&>option]:text-gray-100"
           >
             <option value="">Todas las marcas</option>
             {brands.map((brand) => (
@@ -96,7 +96,7 @@ export function ProductsFilter({
           <select
             value={selectedStatus || ""}
             onChange={(e) => onStatusChange(e.target.value || undefined)}
-            className="w-full px-3 py-2 border rounded-md"
+            className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [&>option]:bg-white [&>option]:text-gray-900 [&>option:checked]:bg-blue-600 [&>option:checked]:text-white dark:[&>option]:bg-gray-800 dark:[&>option]:text-gray-100"
           >
             <option value="">Todos</option>
             <option value="true">Activos</option>
