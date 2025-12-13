@@ -3,8 +3,9 @@
 import { useCallback, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useProducts } from "@/hooks/useProducts";
+import { useProductFilters } from "@/hooks/useProductFilters";
 import { ProductCard } from "@/components/common/product-card";
-import { FilterBar } from "@/components/common/filter-bar";
+import { FilterBar, FilterBarFilters } from "@/components/common/filter-bar";
 import { ProductsPagination } from "@/components/common/products-pagination";
 import { ProductsEmptyState } from "@/components/common/products-empty-state";
 import { ProductsErrorState } from "@/components/common/products-error-state";
@@ -17,33 +18,82 @@ function ProductsContent() {
 
   // Leer parámetros de la URL
   const searchTerm = searchParams.get("search") || "";
+  const categoryFilter = searchParams.get("category") || "";
+  const brandFilter = searchParams.get("brand") || "";
   const pageNumber = parseInt(searchParams.get("page") || "1", 10);
   const pageSize = 12;
 
-  // Fetch con TanStack Query
+  // Obtener categorías y marcas disponibles para filtros
+  const { categories, brands } = useProductFilters();
+
+  // Fetch con TanStack Query - solo enviamos búsqueda textual a la API
   const {
-    products,
-    totalCount,
-    totalPages,
-    currentPage,
+    products: allProducts,
     loading,
     error,
     refetch,
   } = useProducts({
-    pageNumber,
-    pageSize,
+    pageNumber: 1, // Obtenemos todos para filtrar client-side
+    pageSize: 50, // Máximo permitido por el backend
     searchTerm: searchTerm || undefined,
   });
 
+  // Filtrar productos por categoría y marca en el frontend
+  const filteredProducts = useMemo(() => {
+    let filtered = allProducts;
+
+    if (categoryFilter) {
+      const categoryName = categories.find(
+        (c) => c.id.toString() === categoryFilter,
+      )?.name;
+      if (categoryName) {
+        filtered = filtered.filter(
+          (p) => p.categoryName.toLowerCase() === categoryName.toLowerCase(),
+        );
+      }
+    }
+
+    if (brandFilter) {
+      const brandName = brands.find(
+        (b) => b.id.toString() === brandFilter,
+      )?.name;
+      if (brandName) {
+        filtered = filtered.filter(
+          (p) => p.brandName.toLowerCase() === brandName.toLowerCase(),
+        );
+      }
+    }
+
+    return filtered;
+  }, [allProducts, categoryFilter, brandFilter, categories, brands]);
+
+  // Paginación manual en el frontend
+  const totalCount = filteredProducts.length;
+  const totalPages = Math.ceil(totalCount / pageSize);
+  const currentPage = pageNumber;
+  const startIndex = (pageNumber - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const products = filteredProducts.slice(startIndex, endIndex);
+
   // Actualizar URL con nuevos parámetros
   const updateURL = useCallback(
-    (newSearch?: string, newPage?: number) => {
+    (
+      newSearch?: string,
+      newCategoryId?: string,
+      newBrandId?: string,
+      newPage?: number,
+    ) => {
       const params = new URLSearchParams();
 
       const finalSearch = newSearch !== undefined ? newSearch : searchTerm;
+      const finalCategoryId =
+        newCategoryId !== undefined ? newCategoryId : categoryFilter;
+      const finalBrandId = newBrandId !== undefined ? newBrandId : brandFilter;
       const finalPage = newPage !== undefined ? newPage : pageNumber;
 
       if (finalSearch) params.set("search", finalSearch);
+      if (finalCategoryId) params.set("category", finalCategoryId);
+      if (finalBrandId) params.set("brand", finalBrandId);
       if (finalPage > 1) params.set("page", finalPage.toString());
 
       const queryString = params.toString();
@@ -51,19 +101,19 @@ function ProductsContent() {
         scroll: false,
       });
     },
-    [router, searchTerm, pageNumber],
+    [router, searchTerm, categoryFilter, brandFilter, pageNumber],
   );
 
-  const handleSearchChange = useCallback(
-    (search: string) => {
-      updateURL(search, 1); // Reset a página 1 al buscar
+  const handleFiltersChange = useCallback(
+    (filters: FilterBarFilters) => {
+      updateURL(filters.search, filters.categoryId, filters.brandId, 1); // Reset a página 1 al cambiar filtros
     },
     [updateURL],
   );
 
   const handlePageChange = useCallback(
     (page: number) => {
-      updateURL(undefined, page);
+      updateURL(undefined, undefined, undefined, page);
     },
     [updateURL],
   );
@@ -88,10 +138,14 @@ function ProductsContent() {
         Productos Disponibles
       </h1>
 
-      {/* Buscador */}
+      {/* Buscador y Filtros */}
       <FilterBar
-        onSearchChange={handleSearchChange}
+        onFiltersChange={handleFiltersChange}
         initialSearch={searchTerm}
+        initialCategoryId={categoryFilter}
+        initialBrandId={brandFilter}
+        categories={categories}
+        brands={brands}
         isLoading={loading}
       />
 

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useCartStore } from "@/stores/cartStore";
+import { toast } from "sonner";
 import {
   getCart,
   updateCartItemQuantity,
@@ -58,24 +59,34 @@ export function useCart() {
         );
       }
     } catch (error: unknown) {
-      console.error("Error al sincronizar carrito:", error);
       const errorMessage =
         error instanceof Error ? error.message : "Error al sincronizar carrito";
-      setSyncError(errorMessage);
 
-      // No mostramos error si el usuario no está autenticado, mantenemos el carrito local
+      // Si es error de autenticación (401/UNAUTHORIZED), cerrar sesión suavemente
       if (
+        errorMessage === "UNAUTHORIZED" ||
         errorMessage.includes("401") ||
-        errorMessage.includes("autenticado") ||
-        errorMessage.includes("unauthorized")
+        errorMessage.includes("No autorizado")
       ) {
-        // Mantener items locales sin mostrar error
-        console.log(
-          "🔒 Usuario no autenticado, manteniendo carrito local con",
-          items.length,
-          "items",
-        );
+        console.warn("🔒 Token expirado. Cerrando sesión...");
+
+        // Limpiar carrito local
+        setItems([]);
+
+        // Mostrar mensaje de sesión expirada
+        toast.error("Sesión expirada", {
+          description: "Por favor, inicia sesión nuevamente",
+          duration: 4000,
+        });
+
+        // Cerrar sesión (esto actualizará la navbar automáticamente)
+        await signOut({ redirect: false });
+
+        return;
       }
+
+      console.error("Error al sincronizar carrito:", error);
+      setSyncError(errorMessage);
     } finally {
       setLoading(false);
     }

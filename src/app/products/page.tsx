@@ -4,18 +4,39 @@ import type { Metadata } from "next";
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; page?: string }>;
+  searchParams: Promise<{
+    search?: string;
+    category?: string;
+    brand?: string;
+    page?: string;
+  }>;
 }): Promise<Metadata> {
   const params = await searchParams;
   const search = params.search;
+  const category = params.category;
+  const brand = params.brand;
   const page = params.page;
 
   let title = "Productos - Tienda UCN";
   let description = "Explora nuestro catálogo de productos disponibles.";
 
+  const filters: string[] = [];
+
   if (search) {
-    title = `"${search}" - Búsqueda de Productos`;
-    description = `Resultados de búsqueda para "${search}" en Tienda UCN.`;
+    filters.push(`búsqueda: "${search}"`);
+  }
+
+  if (category) {
+    filters.push("filtrado por categoría");
+  }
+
+  if (brand) {
+    filters.push("filtrado por marca");
+  }
+
+  if (filters.length > 0) {
+    title = `Productos - ${filters.join(", ")} - Tienda UCN`;
+    description = `Productos filtrados por: ${filters.join(", ")} en Tienda UCN.`;
   }
 
   if (page && parseInt(page) > 1) {

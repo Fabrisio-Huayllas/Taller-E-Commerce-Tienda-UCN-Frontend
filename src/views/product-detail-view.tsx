@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useProductDetail } from "@/hooks/useProductDetails";
-import { useCartStore } from "@/stores/cartStore";
+import { useProductDetailCart } from "@/hooks/useProductDetailCart";
 import { Toast } from "@/components/ui/toast";
 import { ProductImageCarousel } from "@/components/common/product-image-carousel";
 import { ProductDetailsTable } from "@/components/common/product-details-table";
@@ -19,50 +19,28 @@ export default function ProductDetailView({
   productId,
 }: ProductDetailViewProps) {
   const { product, loading, error, refetch } = useProductDetail(productId);
-  const [quantity, setQuantity] = useState(1);
+  const {
+    quantity,
+    setQuantity,
+    incrementQuantity,
+    decrementQuantity,
+    handleAddToCart: addToCart,
+    buttonText,
+    canAddMore,
+    canDecrement,
+  } = useProductDetailCart({ product });
+
   const [toast, setToast] = useState<{
     message: string;
     type: "error" | "success";
   } | null>(null);
-  const addItem = useCartStore((state) => state.addItem);
 
   const handleAddToCart = () => {
-    if (product) {
-      // Calcular el precio numérico desde el precio base y descuento
-      // Extraer el precio base (precio original sin descuento)
-      const basePrice = parseFloat(product.price.replace(/[^0-9]+/g, ""));
-
-      let successCount = 0;
-      let lastError = null;
-
-      for (let i = 0; i < quantity; i++) {
-        const result = addItem({
-          id: product.id,
-          name: product.title,
-          description: product.description,
-          price: basePrice, // ✅ Guardar el precio ORIGINAL, no el precio con descuento
-          imageUrl: product.imagesURL[0] || "",
-          stock: product.stock,
-          discount: product.discount, // El descuento se aplicará en el cart/checkout
-        });
-
-        if (result.success) {
-          successCount++;
-        } else {
-          lastError = result.message;
-          break; // Detener si llegamos al límite
-        }
-      }
-
-      if (lastError) {
-        setToast({ message: lastError, type: "error" });
-      } else if (successCount > 0) {
-        setToast({
-          message: `${successCount} producto(s) agregado(s) al carrito`,
-          type: "success",
-        });
-        setQuantity(1); // Resetear cantidad después de agregar
-      }
+    const result = addToCart();
+    if (result.success) {
+      setToast({ message: result.message, type: "success" });
+    } else {
+      setToast({ message: result.message, type: "error" });
     }
   };
 
@@ -182,41 +160,44 @@ export default function ProductDetailView({
 
             {/* Selector de cantidad */}
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="quantity-input"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Cantidad:
               </label>
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  disabled={quantity <= 1}
-                  className="w-10 h-10 rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-xl font-semibold text-gray-700"
+                  onClick={decrementQuantity}
+                  disabled={!canDecrement}
+                  className="w-10 h-10 rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-xl font-semibold text-gray-700 transition-colors"
+                  aria-label="Disminuir cantidad"
                 >
                   −
                 </button>
                 <input
+                  id="quantity-input"
                   type="number"
                   min="1"
                   max={product.stock}
                   value={quantity}
-                  onChange={(e) =>
-                    setQuantity(
-                      Math.max(
-                        1,
-                        Math.min(product.stock, Number(e.target.value)),
-                      ),
-                    )
-                  }
+                  onChange={(e) => setQuantity(Number(e.target.value))}
                   className="w-20 h-10 text-center bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900"
+                  aria-label="Cantidad a agregar"
                 />
                 <button
-                  onClick={() =>
-                    setQuantity(Math.min(product.stock, quantity + 1))
-                  }
-                  disabled={quantity >= product.stock}
-                  className="w-10 h-10 rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-xl font-semibold text-gray-700"
+                  onClick={incrementQuantity}
+                  disabled={!canAddMore}
+                  className="w-10 h-10 rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-xl font-semibold text-gray-700 transition-colors"
+                  aria-label="Aumentar cantidad"
                 >
                   +
                 </button>
+                {quantity >= product.stock && (
+                  <span className="text-sm text-orange-600 font-medium">
+                    Máximo
+                  </span>
+                )}
               </div>
             </div>
 
@@ -226,8 +207,9 @@ export default function ProductDetailView({
                 onClick={handleAddToCart}
                 disabled={!product.isAvailable}
                 className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg disabled:bg-gray-300 disabled:cursor-not-allowed shadow-sm"
+                aria-label={buttonText}
               >
-                {product.isAvailable ? "Agregar al carrito" : "No disponible"}
+                {product.isAvailable ? buttonText : "No disponible"}
               </button>
 
               <Link
