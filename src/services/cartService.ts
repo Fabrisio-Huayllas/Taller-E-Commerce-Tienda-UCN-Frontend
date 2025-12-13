@@ -93,6 +93,11 @@ export async function getCart(token?: string | null): Promise<CartResponse> {
         };
       }
 
+      // Si es error 401, lanzar error específico para manejo de autenticación
+      if (response.status === 401) {
+        throw new Error("UNAUTHORIZED");
+      }
+
       // Intentar parsear error
       const text = await response.text();
       console.error("❌ Error response:", text);

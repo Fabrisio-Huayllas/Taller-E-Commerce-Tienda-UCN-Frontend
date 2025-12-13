@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { useProductDetail } from "@/hooks/useProductDetail";
-import { useCartStore } from "@/stores/cartStore";
+import { useProductDetail } from "@/hooks/useProductDetails";
+import { useProductDetailCart } from "@/hooks/useProductDetailCart";
 import { Toast } from "@/components/ui/toast";
+import { ProductImageCarousel } from "@/components/common/product-image-carousel";
+import { ProductDetailsTable } from "@/components/common/product-details-table";
+import { ProductLoadingState } from "@/components/common/product-loading-state";
+import { ProductErrorState } from "@/components/common/product-error-state";
+import { ProductDetailEmptyState } from "@/components/common/product-detail-empty-state";
 
 interface ProductDetailViewProps {
   productId: number;
@@ -14,75 +18,42 @@ interface ProductDetailViewProps {
 export default function ProductDetailView({
   productId,
 }: ProductDetailViewProps) {
-  const { product, loading, error } = useProductDetail(productId);
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [imageError, setImageError] = useState(false);
-  const [quantity, setQuantity] = useState(1);
+  const { product, loading, error, refetch } = useProductDetail(productId);
+  const {
+    quantity,
+    setQuantity,
+    incrementQuantity,
+    decrementQuantity,
+    handleAddToCart: addToCart,
+    buttonText,
+    canAddMore,
+    canDecrement,
+  } = useProductDetailCart({ product });
+
   const [toast, setToast] = useState<{
     message: string;
     type: "error" | "success";
   } | null>(null);
-  const addItem = useCartStore((state) => state.addItem);
 
   const handleAddToCart = () => {
-    if (product) {
-      // Calcular el precio numérico desde el precio base y descuento
-      // Extraer el precio base (precio original sin descuento)
-      const basePrice = parseFloat(product.price.replace(/[^0-9]+/g, ""));
-
-      let successCount = 0;
-      let lastError = null;
-
-      for (let i = 0; i < quantity; i++) {
-        const result = addItem({
-          id: product.id,
-          name: product.title,
-          description: product.description,
-          price: basePrice, // ✅ Guardar el precio ORIGINAL, no el precio con descuento
-          imageUrl: product.imagesURL[0] || "",
-          stock: product.stock,
-          discount: product.discount, // El descuento se aplicará en el cart/checkout
-        });
-
-        if (result.success) {
-          successCount++;
-        } else {
-          lastError = result.message;
-          break; // Detener si llegamos al límite
-        }
-      }
-
-      if (lastError) {
-        setToast({ message: lastError, type: "error" });
-      } else if (successCount > 0) {
-        setToast({
-          message: `${successCount} producto(s) agregado(s) al carrito`,
-          type: "success",
-        });
-        setQuantity(1); // Resetear cantidad después de agregar
-      }
+    const result = addToCart();
+    if (result.success) {
+      setToast({ message: result.message, type: "success" });
+    } else {
+      setToast({ message: result.message, type: "error" });
     }
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <ProductLoadingState />;
   }
 
-  if (error || !product) {
-    return (
-      <div className="flex flex-col justify-center items-center min-h-screen gap-4">
-        <p className="text-red-500 text-lg">
-          {error || "Producto no encontrado"}
-        </p>
-        <Link href="/products" className="text-blue-600 hover:underline">
-          Volver a productos
-        </Link>
-      </div>
-    );
+  if (error) {
+    return <ProductErrorState error={error} onRetry={() => refetch()} />;
+  }
+
+  if (!product) {
+    return <ProductDetailEmptyState />;
   }
 
   return (
@@ -109,72 +80,11 @@ export default function ProductDetailView({
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Galería de imágenes */}
-          <div className="space-y-4">
-            {/* Imagen principal - FIX: usar min-h en lugar de aspect-square */}
-            <div className="relative w-full min-h-[500px] lg:min-h-[600px] bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
-              {!imageError && product.imagesURL[selectedImage] ? (
-                <Image
-                  src={product.imagesURL[selectedImage]}
-                  alt={product.title}
-                  width={450}
-                  height={450}
-                  sizes="(max-width: 768px) 100vw, 600px"
-                  className="object-contain max-w-full max-h-full"
-                  priority
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  <svg
-                    className="w-32 h-32"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              )}
-
-              {/* Badge de descuento */}
-              {product.discount > 0 && (
-                <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded text-sm font-bold">
-                  -{product.discount}%
-                </div>
-              )}
-            </div>
-
-            {/* Miniaturas */}
-            {product.imagesURL.length > 1 && (
-              <div className="grid grid-cols-5 gap-2">
-                {product.imagesURL.map((url, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setSelectedImage(index);
-                      setImageError(false);
-                    }}
-                    className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                      selectedImage === index
-                        ? "border-blue-600"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <Image
-                      src={url}
-                      alt={`Vista ${index + 1}`}
-                      fill
-                      sizes="100px"
-                      className="object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <ProductImageCarousel
+            images={product.imagesURL}
+            title={product.title}
+            discount={product.discount}
+          />
 
           {/* Información del producto */}
           <div className="space-y-6">
@@ -250,41 +160,44 @@ export default function ProductDetailView({
 
             {/* Selector de cantidad */}
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="quantity-input"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Cantidad:
               </label>
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  disabled={quantity <= 1}
-                  className="w-10 h-10 rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-xl font-semibold text-gray-700"
+                  onClick={decrementQuantity}
+                  disabled={!canDecrement}
+                  className="w-10 h-10 rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-xl font-semibold text-gray-700 transition-colors"
+                  aria-label="Disminuir cantidad"
                 >
                   −
                 </button>
                 <input
+                  id="quantity-input"
                   type="number"
                   min="1"
                   max={product.stock}
                   value={quantity}
-                  onChange={(e) =>
-                    setQuantity(
-                      Math.max(
-                        1,
-                        Math.min(product.stock, Number(e.target.value)),
-                      ),
-                    )
-                  }
+                  onChange={(e) => setQuantity(Number(e.target.value))}
                   className="w-20 h-10 text-center bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900"
+                  aria-label="Cantidad a agregar"
                 />
                 <button
-                  onClick={() =>
-                    setQuantity(Math.min(product.stock, quantity + 1))
-                  }
-                  disabled={quantity >= product.stock}
-                  className="w-10 h-10 rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-xl font-semibold text-gray-700"
+                  onClick={incrementQuantity}
+                  disabled={!canAddMore}
+                  className="w-10 h-10 rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-xl font-semibold text-gray-700 transition-colors"
+                  aria-label="Aumentar cantidad"
                 >
                   +
                 </button>
+                {quantity >= product.stock && (
+                  <span className="text-sm text-orange-600 font-medium">
+                    Máximo
+                  </span>
+                )}
               </div>
             </div>
 
@@ -294,8 +207,9 @@ export default function ProductDetailView({
                 onClick={handleAddToCart}
                 disabled={!product.isAvailable}
                 className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg disabled:bg-gray-300 disabled:cursor-not-allowed shadow-sm"
+                aria-label={buttonText}
               >
-                {product.isAvailable ? "Agregar al carrito" : "No disponible"}
+                {product.isAvailable ? buttonText : "No disponible"}
               </button>
 
               <Link
@@ -317,37 +231,12 @@ export default function ProductDetailView({
             </div>
 
             {/* Especificaciones */}
-            <div className="border-t border-gray-200 pt-6 space-y-3">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Especificaciones
-              </h2>
-              <dl className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <dt className="text-gray-500">Marca</dt>
-                  <dd className="font-medium text-gray-900">
-                    {product.brandName}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-gray-500">Estado</dt>
-                  <dd className="font-medium text-gray-900">
-                    {product.statusName}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-gray-500">Categoría</dt>
-                  <dd className="font-medium text-gray-900">
-                    {product.categoryName}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-gray-500">Stock</dt>
-                  <dd className="font-medium text-gray-900">
-                    {product.stock} unidades
-                  </dd>
-                </div>
-              </dl>
-            </div>
+            <ProductDetailsTable
+              brandName={product.brandName}
+              statusName={product.statusName}
+              categoryName={product.categoryName}
+              stock={product.stock}
+            />
           </div>
         </div>
       </div>
