@@ -16,11 +16,13 @@ Antes de ejecutar el proyecto, instala lo siguiente:
 - [Node.js](https://nodejs.org/es/download)
 - [Git 2.45.1+](https://git-scm.com/downloads)
 
-Además se debe seguir las instrucciones del archivo README del siguiente repositorio:
+Además se debe seguir las instrucciones del archivo README del siguiente repositorio (Backend):
 
 - [Repositorio Backend](https://github.com/Fabrisio-Huayllas/Taller-E-Commerce---Tienda-UCN-.git)
 
 Ya que este será necesario para el funcionamiento completo del proyecto.
+
+Nota: El backend por defecto expone la API en `http://localhost:5000/api` según su README. Si usas otro puerto, ajusta la variable `NEXT_PUBLIC_API_URL` más abajo.
 
 ### Pasos de instalación
 
@@ -62,11 +64,18 @@ Ya que este será necesario para el funcionamiento completo del proyecto.
 
    Este comando verá que ya tienes una variable para `AUTH_SECRET` (en este caso, esa variable es `NEXTAUTH_SECRET`) en tu archivo `.env.local`, por lo que debes ingresar `y` cuando pregunte **`Overwrite existing AUTH_SECRET? (y/N)`**.
 
-Si no se ha escrito directamente en tu `.env.local`, revisa si el secret fue escrito en la consola y después copialo y reemplaza `your-auth-secret-here` en el campo `NEXTAUTH_SECRET`. Como en el paso anterior, deja el secret en comillas para evitar errores al leerlo.
+   Si no se ha escrito directamente en tu `.env.local`, revisa si el secret fue escrito en la consola y después copialo y reemplaza `your-auth-secret-here` en el campo `NEXTAUTH_SECRET`. Como en el paso anterior, deja el secret en comillas para evitar errores al leerlo.
 
-```bash
-NEXTAUTH_SECRET=your-auth-secret-here
-```
+   ```bash
+   NEXTAUTH_SECRET="your-auth-secret-here"
+   ```
+
+### Variables de entorno utilizadas
+
+Estas son las variables que utiliza el frontend y deben existir en `.env.local`:
+
+- `NEXT_PUBLIC_API_URL`: URL base de la API del backend. Ej: `"http://localhost:5000/api"`.
+- `NEXTAUTH_SECRET`: Secret de NextAuth, generado con `npx auth secret`.
 
 7. Restaura las dependencias en un terminal de Visual Studio Code.
 
@@ -81,6 +90,47 @@ NEXTAUTH_SECRET=your-auth-secret-here
    ```
 
    Una vez que ya hayas seguido estos pasos, el proyecto se ejecutara en `http://localhost:3000`. Para ver el sitio, presiona `ctrl` y abre la dirección en tu navegador.
+
+### Scripts disponibles
+
+En este proyecto puedes utilizar los siguientes scripts de `npm`:
+
+- `npm run dev`: Inicia el servidor de desarrollo de Next.js.
+- `npm run build`: Construye la aplicación para producción.
+- `npm start`: Sirve la aplicación ya construida.
+
+### Dependencias adicionales
+
+Si estás configurando el entorno completo de UI, estado y formularios, instala estas dependencias recomendadas:
+
+```bash
+# TanStack Query
+npm install @tanstack/react-query
+npm install -D @tanstack/react-query-devtools
+
+# shadcn/ui
+npx shadcn@latest add badge
+
+# Utilidades de estilos
+npm install class-variance-authority
+npm install clsx tailwind-merge
+
+# Toasts
+npm install sonner
+
+# Formularios y validaciones
+npm install react-hook-form @hookform/resolvers zod
+```
+
+### Comprobación rápida de integración
+
+Para verificar que el frontend se comunica correctamente con el backend:
+
+1. Asegúrate que el backend esté ejecutándose en `http://localhost:5000` (o el puerto configurado).
+2. Configura `NEXT_PUBLIC_API_URL` apuntando a `"http://localhost:5000/api"`.
+3. Inicia el frontend con `npm run dev` y prueba iniciar sesión o listar productos.
+
+Si necesitas probar los endpoints manualmente, el backend incluye una colección de Postman y documentación de rutas en su README.
 
 ## Integrantes del grupo
 
