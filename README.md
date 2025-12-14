@@ -1,10 +1,8 @@
 # Tienda UCN – Ecommerce Platform Frontend
 
-Este proyecto consiste en una implementación simplificada del frontend de la plataforma de comercio electrónico "Tienda UCN" utilizando **Next.js**. El sistema incluye la creación de vistas, sesión de usuario y la administración del carrito de compras.
+Este proyecto consiste en una implementación del frontend de la plataforma de comercio electrónico "Tienda UCN" utilizando **Next.js**. El sistema incluye la creación de vistas, sesión de usuario y la administración del carrito de compras.
 
-Esta página fue creada con un enfoque "mobile-first", por lo que responde a distintos tamaños de pantalla y mantiene una experiencia de usuario fluida.
-
-El sistema fue creado para que se utilice junto a una **API REST** creada con **ASP.NET Core 9**, lo cual permite la administración de los datos de los usuarios y productos.
+El sistema fue creado para que se utilice junto a una API REST creada con ASP.NET Core 9, lo cual permite la administración de los datos de los usuarios y productos.
 
 ## Instalación
 
@@ -22,7 +20,7 @@ Además se debe seguir las instrucciones del archivo README del siguiente reposi
 
 Ya que este será necesario para el funcionamiento completo del proyecto.
 
-Nota: El backend por defecto expone la API en `http://localhost:5000/api` según su README. Si usas otro puerto, ajusta la variable `NEXT_PUBLIC_API_URL` más abajo.
+Nota: El backend por defecto expone la API en `http://localhost:5000/api`. Si usas otro puerto, ajusta la variable `NEXT_PUBLIC_API_URL` más abajo.
 
 ### Pasos de instalación
 
@@ -93,7 +91,7 @@ Estas son las variables que utiliza el frontend y deben existir en `.env.local`:
 
 9. **Instala todas las dependencias adicionales:**
 
-   Para asegurar que el proyecto se ejecute correctamente con todas las funcionalidades, es recomendable instalar todas las dependencias adicionales mencionadas en la sección **Dependencias adicionales** más abajo. Puedes ejecutar todos los comandos listados para garantizar que el entorno esté completamente configurado.
+   Para asegurar que el proyecto se ejecute correctamente con todas las funcionalidades, se debe instalar todas las dependencias adicionales mencionadas en la sección **Dependencias adicionales** más abajo. Puedes ejecutar todos los comandos listados para garantizar que el entorno esté completamente configurado.
 
 ### Scripts disponibles
 
@@ -105,7 +103,7 @@ En este proyecto puedes utilizar los siguientes scripts de `npm`:
 
 ### Dependencias adicionales
 
-Si estás configurando el entorno completo de UI, estado y formularios, instala estas dependencias recomendadas:
+Si estás configurando el entorno completo de UI, estado y formularios, instala estas dependencias:
 
 ```bash
 # TanStack Query
