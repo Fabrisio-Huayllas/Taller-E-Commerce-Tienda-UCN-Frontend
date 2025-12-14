@@ -340,7 +340,7 @@ export default function CheckoutView() {
                   <strong>Usuario:</strong> {session?.user?.email}
                 </p>
                 <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
-                  La orden esta registrada solo al dueño de esta cuenta cuenta.
+                  La orden está registrada solo al dueño de esta cuenta.
                 </p>
               </div>
             </div>
