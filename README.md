@@ -91,6 +91,10 @@ Estas son las variables que utiliza el frontend y deben existir en `.env.local`:
 
    Una vez que ya hayas seguido estos pasos, el proyecto se ejecutara en `http://localhost:3000`. Para ver el sitio, presiona `ctrl` y abre la dirección en tu navegador.
 
+9. **Instala todas las dependencias adicionales:**
+
+   Para asegurar que el proyecto se ejecute correctamente con todas las funcionalidades, es recomendable instalar todas las dependencias adicionales mencionadas en la sección **Dependencias adicionales** más abajo. Puedes ejecutar todos los comandos listados para garantizar que el entorno esté completamente configurado.
+
 ### Scripts disponibles
 
 En este proyecto puedes utilizar los siguientes scripts de `npm`:
@@ -120,6 +124,9 @@ npm install sonner
 
 # Formularios y validaciones
 npm install react-hook-form @hookform/resolvers zod
+
+# Componentes Radix UI
+npm install @radix-ui/react-select
 ```
 
 ### Comprobación rápida de integración
